@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms &amp; Conditions | DealMind AI — B2B Contract Negotiation Co-Pilot</title>
+  <meta name="description" content="DealMind AI Terms of Service — enterprise B2B service terms, acceptable use policy, liability limits, SLA commitments, and platform usage conditions." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://dealmind.ai/terms" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- Header -->
+<header class="header" role="banner">
+  <div class="header-inner">
+    <a class="logo" href="./index.html" aria-label="DealMind AI - Home">
+      <div class="logo-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7l-9-5z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.5"/>
+          <circle cx="12" cy="11" r="2.5" fill="white"/>
+          <line x1="12" y1="6" x2="12" y2="8.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="13.5" x2="12" y2="16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">DealMind AI</span>
+    </a>
+    <nav role="navigation" aria-label="Main navigation">
+      <ul class="nav-links">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="./index.html#dashboard">Dashboard</a></li>
+        <li><a href="./privacy.html">Privacy</a></li>
+        <li><a href="./terms.html" class="active" aria-current="page">Terms</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+  <a href="./index.html">🏠 Home</a>
+  <a href="./index.html#dashboard">📊 Dashboard</a>
+  <a href="./privacy.html">🔒 Privacy Policy</a>
+  <a href="./terms.html" aria-current="page">📋 Terms &amp; Conditions</a>
+</nav>
+
+<main class="page-wrapper" role="main">
+  <div class="legal-page">
+    <div style="margin-bottom:1rem;">
+      <span class="badge badge-info">Legal Document</span>
+    </div>
+    <h1>Terms &amp; Conditions</h1>
+    <p class="last-updated">Last updated: September 28, 2026 · Version 3.0 · Effective: October 1, 2026</p>
+
+    <div class="insight-callout" style="margin-bottom:2rem;">
+      <span class="insight-callout-icon" aria-hidden="true">⚠️</span>
+      <span><strong>Important:</strong> These Terms constitute a legally binding agreement between your organization and DealMind AI. AI-generated outputs are advisory only and do not constitute legal advice. Please review Section 8 (Disclaimer) and Section 9 (Limitation of Liability) carefully.</span>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="legal-toc" aria-labelledby="toc-heading">
+      <h3 id="toc-heading">Table of Contents</h3>
+      <ol>
+        <li><a href="#acceptance">Acceptance of Terms</a></li>
+        <li><a href="#services">Description of Services</a></li>
+        <li><a href="#enterprise-access">Enterprise Access &amp; Accounts</a></li>
+        <li><a href="#acceptable-use">Acceptable Use Policy</a></li>
+        <li><a href="#intellectual-property">Intellectual Property Rights</a></li>
+        <li><a href="#subscription">Subscription &amp; Payment</a></li>
+        <li><a href="#sla">Service Level Agreement (SLA)</a></li>
+        <li><a href="#disclaimer">Disclaimer of Warranties</a></li>
+        <li><a href="#liability">Limitation of Liability</a></li>
+        <li><a href="#indemnification">Indemnification</a></li>
+        <li><a href="#confidentiality">Confidentiality</a></li>
+        <li><a href="#termination">Termination</a></li>
+        <li><a href="#governing-law">Governing Law &amp; Dispute Resolution</a></li>
+        <li><a href="#changes">Changes to Terms</a></li>
+        <li><a href="#contact">Contact Information</a></li>
+      </ol>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="legal-section" id="acceptance">
+      <h2>1. Acceptance of Terms</h2>
+      <p>By accessing or using the DealMind AI platform ("Platform"), you ("User," "Customer," or "Enterprise") agree to be bound by these Terms &amp; Conditions ("Terms") and all applicable laws and regulations. If you are entering into these Terms on behalf of an organization, you represent and warrant that you have the authority to bind that organization.</p>
+      <p>If you do not agree to these Terms, you must immediately cease using the Platform. These Terms apply to all users, including trial users, enterprise subscribers, and API integration users.</p>
+      <p>These Terms were last updated on September 28, 2026, and supersede all prior agreements between you and DealMind AI relating to the Platform.</p>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="legal-section" id="services">
+      <h2>2. Description of Services</h2>
+      <p>DealMind AI provides the following services through its Platform:</p>
+
+      <h3>2.1 Core Platform Features</h3>
+      <ul>
+        <li><strong>Contract Analysis Engine:</strong> AI-powered review of procurement contracts, SaaS agreements, vendor MSAs, and enterprise service contracts to identify risk clauses, pricing anomalies, and SLA vulnerabilities</li>
+        <li><strong>Hindsight Memory System:</strong> Proprietary technology that builds and maintains an organizational negotiation memory database, recalling historical vendor concessions, SLA breach records, and pricing patterns</li>
+        <li><strong>Risk Scoring:</strong> Automated risk assessment producing quantified risk scores (0–100) across pricing, SLA, liability, and compliance dimensions</li>
+        <li><strong>Counter-Offer Generation:</strong> AI-assisted drafting of negotiation counter-proposals informed by historical memory data and clause-specific analysis</li>
+        <li><strong>Leverage Intelligence:</strong> Real-time calculation of negotiating leverage based on memory depth, competitive alternatives, and historical concession patterns</li>
+      </ul>
+
+      <h3>2.2 Service Limitations</h3>
+      <ul>
+        <li>All AI-generated outputs are advisory recommendations, not legal advice</li>
+        <li>The Platform does not execute contracts on your behalf or represent you in legal proceedings</li>
+        <li>Hindsight Memory accuracy depends on the quality and completeness of historical data provided by the Customer</li>
+        <li>Platform availability is subject to the SLA outlined in Section 7</li>
+      </ul>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="legal-section" id="enterprise-access">
+      <h2>3. Enterprise Access &amp; Accounts</h2>
+      <ul>
+        <li>Enterprise subscriptions require a signed Master Services Agreement (MSA) and Data Processing Agreement (DPA)</li>
+        <li>You are responsible for maintaining the confidentiality of your account credentials and API keys</li>
+        <li>You must immediately notify DealMind AI of any unauthorized account access at <a href="mailto:security@dealmind.ai">security@dealmind.ai</a></li>
+        <li>You may not share, sublicense, or resell Platform access to third parties without written consent</li>
+        <li>Enterprise accounts are provisioned with role-based access control (RBAC); you are responsible for appropriate user permission configuration</li>
+        <li>Trial accounts are limited to 14 days, 5 contract uploads, and 10 counter-offer generations; trial data is purged after expiry</li>
+      </ul>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="legal-section" id="acceptable-use">
+      <h2>4. Acceptable Use Policy</h2>
+      <p>You agree <strong>not</strong> to use DealMind AI to:</p>
+      <ul>
+        <li>Violate any applicable laws, regulations, or third-party rights</li>
+        <li>Upload contracts or documents you do not have the legal right to process</li>
+        <li>Reverse-engineer, decompile, or extract proprietary AI model weights or training data</li>
+        <li>Conduct automated scraping, crawling, or bulk data extraction via the API beyond contracted limits</li>
+        <li>Attempt to manipulate, bias, or poison the Hindsight Memory system with false historical data</li>
+        <li>Use AI-generated counter-offers in contexts that constitute unauthorized practice of law</li>
+        <li>Process any contracts involving sanctioned entities in violation of OFAC, EU, or UN sanctions lists</li>
+        <li>Benchmark or competitively analyze DealMind AI's AI outputs for the purpose of developing competing products</li>
+        <li>Introduce malware, viruses, or harmful code into the Platform</li>
+        <li>Circumvent usage limits, rate limits, or access controls through technical means</li>
+      </ul>
+      <p>Violations of this Acceptable Use Policy may result in immediate account suspension without refund and potential legal action.</p>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="legal-section" id="intellectual-property">
+      <h2>5. Intellectual Property Rights</h2>
+
+      <h3>5.1 DealMind AI Intellectual Property</h3>
+      <p>DealMind AI retains all right, title, and interest in:</p>
+      <ul>
+        <li>The Platform, including source code, AI models, algorithms, and user interface</li>
+        <li>The Hindsight Memory architecture and underlying technology</li>
+        <li>Aggregate, anonymized benchmark datasets and market intelligence</li>
+        <li>DealMind AI brand assets, trademarks, and trade names</li>
+      </ul>
+
+      <h3>5.2 Customer Data Ownership</h3>
+      <p>Customers retain full ownership of:</p>
+      <ul>
+        <li>All contract documents and procurement data uploaded to the Platform</li>
+        <li>Historical negotiation records and organizational memory data</li>
+        <li>Counter-offer drafts generated by AI (once generated, they are your intellectual property)</li>
+        <li>Any annotations, notes, or customizations added to contracts within the Platform</li>
+      </ul>
+
+      <h3>5.3 License Grant</h3>
+      <p>You grant DealMind AI a limited, non-exclusive, revocable license to process, analyze, and store your data solely for the purpose of providing the contracted services. This license terminates upon contract expiry or data deletion request.</p>
+    </div>
+
+    <!-- Section 6 -->
+    <div class="legal-section" id="subscription">
+      <h2>6. Subscription &amp; Payment</h2>
+      <ul>
+        <li><strong>Billing:</strong> Enterprise subscriptions are billed annually in advance unless otherwise specified in the Order Form</li>
+        <li><strong>Price Changes:</strong> DealMind AI will provide 90 days written notice before any subscription price increase</li>
+        <li><strong>Overages:</strong> API usage exceeding contracted limits will be billed at standard overage rates defined in the Order Form</li>
+        <li><strong>Refunds:</strong> Annual subscriptions are non-refundable after 30 days from subscription start; pro-rated credits may be issued for early termination at DealMind AI's discretion</li>
+        <li><strong>Late Payment:</strong> Invoices unpaid after 30 days are subject to 1.5% monthly interest; access may be suspended after 45 days of non-payment</li>
+        <li><strong>Taxes:</strong> All fees are exclusive of applicable taxes; Customer is responsible for all applicable taxes in their jurisdiction</li>
+        <li><strong>Trial Periods:</strong> Trial periods do not require payment; credit card information is not required for trial access</li>
+      </ul>
+    </div>
+
+    <!-- Section 7 -->
+    <div class="legal-section" id="sla">
+      <h2>7. Service Level Agreement (SLA)</h2>
+
+      <h3>7.1 Uptime Commitment</h3>
+      <ul>
+        <li><strong>Standard (Business/Growth):</strong> 99.5% monthly uptime</li>
+        <li><strong>Enterprise:</strong> 99.9% monthly uptime with dedicated support</li>
+        <li>Uptime calculated as: ((total minutes - downtime minutes) / total minutes) × 100</li>
+      </ul>
+
+      <h3>7.2 Excluded Downtime</h3>
+      <ul>
+        <li>Scheduled maintenance windows (announced 48 hours in advance)</li>
+        <li>Force majeure events (natural disasters, war, pandemic)</li>
+        <li>Third-party infrastructure failures beyond DealMind AI's reasonable control</li>
+        <li>Customer-caused outages (e.g., excessive API abuse, credential compromise)</li>
+      </ul>
+
+      <h3>7.3 SLA Credits</h3>
+      <ul>
+        <li>99.0–99.5%: 10% monthly fee credit</li>
+        <li>95.0–99.0%: 25% monthly fee credit</li>
+        <li>Below 95.0%: 50% monthly fee credit</li>
+        <li>Credits are applied to the next billing cycle and are the sole remedy for SLA breaches</li>
+        <li>Credits must be requested within 30 days of the qualifying downtime event</li>
+      </ul>
+
+      <h3>7.4 Support Response Times</h3>
+      <ul>
+        <li><strong>P1 (Platform Down):</strong> 2-hour response, 8-hour resolution target</li>
+        <li><strong>P2 (Major Feature Degraded):</strong> 4-hour response, 24-hour resolution target</li>
+        <li><strong>P3 (Minor Issue):</strong> 1-business-day response, 5-business-day resolution target</li>
+      </ul>
+    </div>
+
+    <!-- Section 8 -->
+    <div class="legal-section" id="disclaimer">
+      <h2>8. Disclaimer of Warranties</h2>
+      <p style="color:var(--text-primary); font-weight:600;">THE DEALMIND AI PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED.</p>
+      <p>DealMind AI specifically disclaims:</p>
+      <ul>
+        <li>Any implied warranties of merchantability, fitness for a particular purpose, or non-infringement</li>
+        <li>Guarantees that AI-generated outputs (risk scores, counter-offers, memory insights) are legally accurate, complete, or suitable for any specific negotiation</li>
+        <li>Warranties that Hindsight Memory will capture all relevant historical data or produce optimal negotiation outcomes</li>
+        <li>Guarantees that the Platform will be error-free, uninterrupted, or free from security vulnerabilities</li>
+      </ul>
+      <p><strong>AI OUTPUTS ARE NOT LEGAL ADVICE.</strong> All counter-offers, risk assessments, and negotiation recommendations generated by DealMind AI must be reviewed and approved by qualified legal counsel before use in active contract negotiations. DealMind AI shall not be liable for outcomes of negotiations conducted using AI-generated outputs.</p>
+    </div>
+
+    <!-- Section 9 -->
+    <div class="legal-section" id="liability">
+      <h2>9. Limitation of Liability</h2>
+      <p style="color:var(--text-primary); font-weight:600;">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:</p>
+      <ul>
+        <li><strong>Aggregate Cap:</strong> DealMind AI's total aggregate liability for any claims arising out of or relating to these Terms shall not exceed the total fees paid by Customer in the <strong>twelve (12) months preceding the claim</strong></li>
+        <li><strong>Exclusion of Consequential Damages:</strong> Neither party shall be liable for indirect, incidental, special, punitive, or consequential damages, including but not limited to loss of profits, revenue, data, business opportunities, or goodwill</li>
+        <li><strong>Negotiation Outcome Disclaimer:</strong> DealMind AI shall not be liable for any losses or damages arising from contract negotiations conducted using AI-generated outputs, regardless of whether Hindsight Memory was active</li>
+        <li><strong>Third-Party AI Providers:</strong> DealMind AI is not liable for errors, outages, or policy changes by third-party AI inference providers (OpenAI, Anthropic) that affect Platform functionality</li>
+      </ul>
+      <p>Some jurisdictions do not allow the exclusion or limitation of liability for consequential or incidental damages. In such jurisdictions, the above limitations shall apply to the extent permitted by law.</p>
+    </div>
+
+    <!-- Section 10 -->
+    <div class="legal-section" id="indemnification">
+      <h2>10. Indemnification</h2>
+      <p>You agree to defend, indemnify, and hold harmless DealMind AI and its officers, directors, employees, and agents from and against any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising from:</p>
+      <ul>
+        <li>Your use of the Platform in violation of these Terms</li>
+        <li>Your violation of any third-party rights, including intellectual property or privacy rights</li>
+        <li>Content or data you upload to the Platform (including contracts containing third-party confidential information)</li>
+        <li>Your use of AI-generated outputs in actual contract negotiations or legal proceedings</li>
+        <li>Misrepresentation of authority to enter into these Terms</li>
+      </ul>
+    </div>
+
+    <!-- Section 11 -->
+    <div class="legal-section" id="confidentiality">
+      <h2>11. Confidentiality</h2>
+      <p>Both parties agree to keep confidential all non-public information disclosed under these Terms ("Confidential Information") and to:</p>
+      <ul>
+        <li>Use Confidential Information solely for the purpose of providing or receiving the contracted services</li>
+        <li>Protect Confidential Information with at least the same degree of care used to protect their own confidential information, but no less than reasonable care</li>
+        <li>Not disclose Confidential Information to third parties without prior written consent</li>
+        <li>Return or destroy Confidential Information upon termination of these Terms</li>
+      </ul>
+      <p>Obligations do not apply to information that: (a) is or becomes publicly known through no breach of these Terms; (b) was already known prior to disclosure; (c) is independently developed without use of Confidential Information; or (d) must be disclosed by law or regulation.</p>
+    </div>
+
+    <!-- Section 12 -->
+    <div class="legal-section" id="termination">
+      <h2>12. Termination</h2>
+
+      <h3>12.1 Termination by Customer</h3>
+      <ul>
+        <li>Enterprise customers may terminate with 30 days written notice at the end of any subscription term</li>
+        <li>Mid-term terminations are subject to the refund policy in Section 6</li>
+        <li>Customers may request immediate account deletion, subject to legal hold obligations</li>
+      </ul>
+
+      <h3>12.2 Termination by DealMind AI</h3>
+      <ul>
+        <li>DealMind AI may suspend or terminate accounts for material breach of these Terms, including Acceptable Use Policy violations</li>
+        <li>30 days written notice provided for termination not related to breach</li>
+        <li>Immediate termination permitted for: unpaid invoices after 45 days, illegal use, or security threats</li>
+      </ul>
+
+      <h3>12.3 Effect of Termination</h3>
+      <ul>
+        <li>Customer data is retained for 90 days post-termination for export purposes</li>
+        <li>After 90 days, all customer data is permanently deleted per our Data Retention Policy</li>
+        <li>Provisions of these Terms that by their nature should survive termination shall survive, including Sections 5, 8, 9, 10, 11, and 13</li>
+      </ul>
+    </div>
+
+    <!-- Section 13 -->
+    <div class="legal-section" id="governing-law">
+      <h2>13. Governing Law &amp; Dispute Resolution</h2>
+      <ul>
+        <li><strong>Governing Law:</strong> These Terms shall be governed by the laws of the State of Delaware, United States, without regard to conflict of law principles</li>
+        <li><strong>Informal Resolution:</strong> Parties shall attempt to resolve disputes informally within 30 days of written notice before initiating formal proceedings</li>
+        <li><strong>Arbitration:</strong> Disputes not resolved informally shall be submitted to binding arbitration under JAMS rules in Hyderabad, India or New York, NY (Customer's choice for enterprise agreements)</li>
+        <li><strong>Class Action Waiver:</strong> All disputes must be pursued on an individual basis; class action or collective arbitration proceedings are not permitted</li>
+        <li><strong>EU/UK Customers:</strong> Nothing in this section limits statutory rights available under EU or UK consumer protection law</li>
+      </ul>
+    </div>
+
+    <!-- Section 14 -->
+    <div class="legal-section" id="changes">
+      <h2>14. Changes to Terms</h2>
+      <p>DealMind AI reserves the right to modify these Terms at any time. For material changes:</p>
+      <ul>
+        <li>Enterprise customers will receive email notification at least 30 days before changes take effect</li>
+        <li>Trial and self-serve customers will receive in-app notifications</li>
+        <li>Continued use of the Platform after the effective date constitutes acceptance of updated Terms</li>
+        <li>If you do not agree to updated Terms, you must cease using the Platform and request account termination</li>
+        <li>Material changes include: fee structures, data rights, liability limits, and arbitration clauses</li>
+      </ul>
+    </div>
+
+    <!-- Section 15 -->
+    <div class="legal-section" id="contact">
+      <h2>15. Contact Information</h2>
+      <p>For questions about these Terms, please contact:</p>
+      <ul>
+        <li><strong>General Legal:</strong> <a href="mailto:legal@dealmind.ai">legal@dealmind.ai</a></li>
+        <li><strong>Enterprise Agreements:</strong> <a href="mailto:enterprise@dealmind.ai">enterprise@dealmind.ai</a></li>
+        <li><strong>Security &amp; Compliance:</strong> <a href="mailto:security@dealmind.ai">security@dealmind.ai</a></li>
+        <li><strong>Privacy &amp; Data Requests:</strong> <a href="mailto:privacy@dealmind.ai">privacy@dealmind.ai</a></li>
+        <li><strong>Response SLA:</strong> 5 business days for legal queries; 24 hours for enterprise contract issues</li>
+      </ul>
+    </div>
+
+    <div style="padding:1.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); margin-top:2rem;">
+      <p style="font-size:0.82rem; color:var(--text-muted);">These Terms &amp; Conditions are effective as of October 1, 2026. For enterprise customers with existing MSAs, the terms of the executed MSA shall govern in cases of conflict with these Terms. Questions about specific enterprise agreement provisions should be directed to your DealMind AI Account Executive.</p>
+      <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
+        <a href="./privacy.html" class="btn btn-secondary btn-sm">View Privacy Policy</a>
+        <a href="./index.html" class="btn btn-ghost btn-sm">← Back to Home</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Cookie Banner -->
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Cookie consent">
+  <p class="cookie-text">
+    <strong>🍪 Cookie Notice</strong> — We use cookies to keep you logged in and improve your experience. <a href="./privacy.html#cookies">Cookie Policy</a>
+  </p>
+  <div class="cookie-actions">
+    <button class="btn btn-ghost btn-sm" onclick="acceptCookies('essential')" id="cookie-essential-btn">Essential Only</button>
+    <button class="btn btn-primary btn-sm" onclick="acceptCookies('all')" id="cookie-accept-btn">✓ Accept All</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById('hamburger').addEventListener('click', function() {
+    const nav = document.getElementById('mobile-nav');
+    const isOpen = nav.classList.toggle('open');
+    this.classList.toggle('open', isOpen);
+    this.setAttribute('aria-expanded', isOpen);
+  });
+
+  function acceptCookies(type) {
+    localStorage.setItem('dealmind_cookie_prefs', JSON.stringify({ type, timestamp: new Date().toISOString() }));
+    const banner = document.getElementById('cookie-banner');
+    banner.classList.remove('visible');
+    setTimeout(() => banner.remove(), 400);
+  }
+
+  if (!localStorage.getItem('dealmind_cookie_prefs')) {
+    setTimeout(() => document.getElementById('cookie-banner').classList.add('visible'), 800);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.getElementById('mobile-nav').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+      document.getElementById('hamburger').setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DealMind AI | B2B Contract Negotiation &amp; Procurement Co-Pilot</title>
+  <meta name="description" content="Autonomous B2B procurement agent leveraging Hindsight Memory to recall past vendor concessions, flag SLA breaches, and draft high-leverage counter-offers." />
+  <meta name="keywords" content="AI contract negotiation, procurement automation, SaaS vendor management, B2B negotiation AI, contract analysis, Hindsight Memory" />
+  <meta name="author" content="DealMind AI" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dealmind.ai/" />
+  <meta property="og:title" content="DealMind AI | B2B Contract Negotiation &amp; Procurement Co-Pilot" />
+  <meta property="og:description" content="Autonomous B2B procurement agent leveraging Hindsight Memory to recall past vendor concessions, flag SLA breaches, and draft high-leverage counter-offers." />
+  <meta property="og:image" content="./og-preview.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="DealMind AI" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@DealMindAI" />
+  <meta name="twitter:title" content="DealMind AI | B2B Contract Negotiation &amp; Procurement Co-Pilot" />
+  <meta name="twitter:description" content="Autonomous B2B procurement agent leveraging Hindsight Memory to recall past vendor concessions, flag SLA breaches, and draft high-leverage counter-offers." />
+  <meta name="twitter:image" content="./og-preview.jpg" />
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./site.webmanifest" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://dealmind.ai/" />
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Inline SVG Favicon -->
+  <style>
+    /* Additional page-specific micro-styles */
+    .nav-hackathon-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.2));
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: var(--radius-full);
+      padding: 0.25rem 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent-emerald-light);
+      letter-spacing: 0.04em;
+    }
+    .view-page { display: none; }
+    .view-page.active { display: block; }
+    #dashboard-view { display: none; }
+    #dashboard-view.active { display: flex; flex-direction: column; }
+    .clause-tooltip { display: none; }
+    .memory-timeline { position: relative; }
+    .memory-timeline::before { content: ''; position: absolute; left: 1.1rem; top: 0; bottom: 0; width: 1px; background: var(--border-accent); opacity: 0.5; }
+    .risk-ring-svg { transform: rotate(-90deg); }
+    .progress-text { font-size: 0.7rem; font-weight: 700; }
+    .vendor-chip { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.25); border-radius: var(--radius-full); padding: 0.2rem 0.6rem; font-size: 0.72rem; font-weight: 600; color: #38BDF8; }
+    .clause-badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: var(--radius-full); margin-left: 0.4rem; vertical-align: middle; }
+    .clause-badge-risk { background: var(--risk-high-bg); color: var(--risk-high); }
+    .clause-badge-memory { background: var(--accent-emerald-glow); color: var(--accent-emerald-light); }
+    .section-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 0.25rem 0 1rem; }
+    .loading-overlay { position: absolute; inset: 0; background: rgba(15,23,42,0.8); display: flex; align-items: center; justify-content: center; border-radius: inherit; z-index: 10; backdrop-filter: blur(4px); }
+    .pulse-ring { width: 48px; height: 48px; border: 2px solid var(--accent-emerald); border-radius: 50%; animation: pulse-ring 1.5s ease-in-out infinite; }
+    @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+    .memory-strength-bar { display: flex; gap: 3px; margin-top: 0.4rem; }
+    .memory-strength-bar span { height: 4px; flex: 1; border-radius: var(--radius-full); background: var(--bg-elevated); }
+    .memory-strength-bar span.filled { background: var(--accent-emerald); }
+    .counter-tone-select { background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.5rem 0.75rem; color: var(--text-primary); font-size: 0.8rem; font-family: var(--font-sans); cursor: pointer; min-height: 44px; appearance: none; padding-right: 2rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.6rem center; }
+    .counter-tone-select:focus { border-color: var(--border-focus); outline: none; }
+    .export-btn { transition: all var(--transition); }
+    .copy-success { color: var(--accent-emerald) !important; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ══════════════════════════════════════════
+     HEADER / NAVIGATION
+══════════════════════════════════════════ -->
+<header class="header" role="banner">
+  <div class="header-inner">
+    <a class="logo" href="#" onclick="showView('home')" aria-label="DealMind AI - Home">
+      <div class="logo-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7l-9-5z" fill="rgba(255,255,255,0.15)" stroke="#0F172A" stroke-width="0.5"/>
+          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7l-9-5z" fill="none" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="12" cy="11" r="2.5" fill="white"/>
+          <line x1="12" y1="6" x2="12" y2="8.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="9" y1="9" x2="10.8" y2="10" stroke="white" stroke-width="1" stroke-linecap="round"/>
+          <line x1="15" y1="9" x2="13.2" y2="10" stroke="white" stroke-width="1" stroke-linecap="round"/>
+          <line x1="9" y1="13.5" x2="10.8" y2="12.2" stroke="white" stroke-width="1" stroke-linecap="round"/>
+          <line x1="15" y1="13.5" x2="13.2" y2="12.2" stroke="white" stroke-width="1" stroke-linecap="round"/>
+          <line x1="12" y1="13.5" x2="12" y2="16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">DealMind AI</span>
+      <span class="logo-badge">Beta</span>
+    </a>
+
+    <nav role="navigation" aria-label="Main navigation">
+      <ul class="nav-links">
+        <li><a href="#" onclick="showView('home')" id="nav-home" class="active">Home</a></li>
+        <li><a href="#" onclick="showView('dashboard')" id="nav-dashboard">Dashboard</a></li>
+        <li><a href="./privacy.html" id="nav-privacy">Privacy</a></li>
+        <li><a href="./terms.html" id="nav-terms">Terms</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-actions">
+      <span class="nav-hackathon-badge" aria-label="HackWithHyderabad 3.0 submission">⚡ HackwithHyd 3.0</span>
+      <button class="btn btn-primary btn-sm" onclick="showView('dashboard')" id="try-demo-btn">
+        Try Demo
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Nav Drawer -->
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+  <a href="#" onclick="showView('home'); closeMobileNav()">🏠 Home</a>
+  <a href="#" onclick="showView('dashboard'); closeMobileNav()">📊 Dashboard</a>
+  <a href="./privacy.html">🔒 Privacy Policy</a>
+  <a href="./terms.html">📋 Terms &amp; Conditions</a>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     HOME PAGE VIEW
+══════════════════════════════════════════ -->
+<main id="home-view" class="view-page active" role="main">
+  <div class="page-wrapper">
+
+    <!-- Hero Section -->
+    <section class="hero-section" aria-labelledby="hero-heading">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-content">
+        <div class="hero-eyebrow" role="doc-subtitle">
+          <span aria-hidden="true">🧠</span> Hindsight Memory Technology · HackwithHyderabad 3.0
+        </div>
+        <h1 class="hero-title" id="hero-heading">
+          Negotiate Contracts Like<br/>
+          <span class="gradient-text">You've Seen It All Before</span>
+        </h1>
+        <p class="hero-desc">
+          DealMind AI is an autonomous B2B procurement co-pilot that harnesses <strong>Hindsight Memory</strong> — 
+          recalling every vendor concession, SLA breach, and pricing pattern across your entire negotiation history 
+          to deliver expert leverage in real-time.
+        </p>
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-lg" onclick="showView('dashboard')" id="hero-cta-dashboard">
+            <span aria-hidden="true">⚡</span> Launch Dashboard
+          </button>
+          <button class="btn btn-secondary btn-lg" onclick="scrollToFeatures()" id="hero-cta-features">
+            <span aria-hidden="true">→</span> See Features
+          </button>
+        </div>
+
+        <div class="hero-stats" role="list" aria-label="Key statistics">
+          <div class="hero-stat" role="listitem">
+            <span class="hero-stat-number" aria-label="47 percent">47%</span>
+            <span class="hero-stat-label">Avg. Cost Reduction</span>
+          </div>
+          <div class="hero-stat" role="listitem">
+            <span class="hero-stat-number" aria-label="3.2 times">3.2x</span>
+            <span class="hero-stat-label">Leverage Increase</span>
+          </div>
+          <div class="hero-stat" role="listitem">
+            <span class="hero-stat-number" aria-label="12 seconds">12s</span>
+            <span class="hero-stat-label">Counter-Offer Speed</span>
+          </div>
+          <div class="hero-stat" role="listitem">
+            <span class="hero-stat-number" aria-label="98 percent">98%</span>
+            <span class="hero-stat-label">SLA Detection Rate</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features" aria-labelledby="features-heading">
+      <div class="container">
+        <p class="section-eyebrow">Core Capabilities</p>
+        <h2 class="section-title" id="features-heading">Everything You Need to Win Every Deal</h2>
+        <p class="section-desc">Purpose-built for enterprise procurement teams negotiating complex multi-year SaaS and vendor contracts.</p>
+
+        <div class="features-grid">
+          <article class="feature-card" aria-labelledby="feat-1-title">
+            <div class="feature-icon" aria-hidden="true">🧠</div>
+            <h3 class="feature-title" id="feat-1-title">Hindsight Memory Engine</h3>
+            <p class="feature-desc">Recalls every past SLA breach, vendor concession, and pricing pattern across your negotiation history. Gets smarter with every interaction.</p>
+          </article>
+          <article class="feature-card" aria-labelledby="feat-2-title">
+            <div class="feature-icon" aria-hidden="true">⚠️</div>
+            <h3 class="feature-title" id="feat-2-title">Risk Clause Detection</h3>
+            <p class="feature-desc">AI-powered scanning instantly flags high-risk clauses — auto-renewal traps, liability gaps, SLA loopholes — with severity scoring.</p>
+          </article>
+          <article class="feature-card" aria-labelledby="feat-3-title">
+            <div class="feature-icon" aria-hidden="true">✍️</div>
+            <h3 class="feature-title" id="feat-3-title">Counter-Offer Generator</h3>
+            <p class="feature-desc">One-click generation of legally-informed counter-proposals, tailored to the specific vendor and informed by historical concessions.</p>
+          </article>
+          <article class="feature-card" aria-labelledby="feat-4-title">
+            <div class="feature-icon" aria-hidden="true">📊</div>
+            <h3 class="feature-title" id="feat-4-title">Dual-Mode Demo</h3>
+            <p class="feature-desc">See the power of Hindsight Memory: compare a baseline generic response (Interaction 1) against an expert AI with 5+ cycles of memory.</p>
+          </article>
+          <article class="feature-card" aria-labelledby="feat-5-title">
+            <div class="feature-icon" aria-hidden="true">🔒</div>
+            <h3 class="feature-title" id="feat-5-title">Enterprise-Grade Security</h3>
+            <p class="feature-desc">AES-256 encrypted document storage, SOC2 Type II compliant infrastructure, zero-retention AI inference, and full GDPR/CCPA adherence.</p>
+          </article>
+          <article class="feature-card" aria-labelledby="feat-6-title">
+            <div class="feature-icon" aria-hidden="true">⚡</div>
+            <h3 class="feature-title" id="feat-6-title">Real-Time Leverage Score</h3>
+            <p class="feature-desc">Dynamic scoring that quantifies your negotiating leverage as a percentage, updated live as memory entries are surfaced and clauses analyzed.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="padding: 5rem 1.5rem; text-align: center; border-top: 1px solid var(--border);" aria-labelledby="cta-heading">
+      <div class="container" style="max-width: 600px;">
+        <div class="hero-eyebrow" style="margin: 0 auto 1.5rem; display: inline-flex;">
+          <span>🚀</span> Live Demo Ready
+        </div>
+        <h2 id="cta-heading">Experience Hindsight Memory in Action</h2>
+        <p style="margin: 1rem auto 2rem; max-width: 480px;">Pre-loaded with a Datadog SaaS Renewal contract and 5 years of synthetic memory entries. No signup required.</p>
+        <button class="btn btn-primary btn-lg" onclick="showView('dashboard')" id="cta-launch-btn">
+          <span aria-hidden="true">⚡</span> Launch Dashboard Now
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a class="logo" href="#" onclick="showView('home')" aria-label="DealMind AI">
+            <div class="logo-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7l-9-5z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.5"/><circle cx="12" cy="11" r="2.5" fill="white"/></svg>
+            </div>
+            <span class="logo-text" style="font-size: 1rem;">DealMind AI</span>
+          </a>
+          <p>B2B Contract &amp; Procurement Negotiation Co-Pilot powered by Hindsight Memory. Built for HackwithHyderabad 3.0.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#" onclick="showView('dashboard')">Dashboard</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#" onclick="showView('dashboard')">Demo Mode</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="./privacy.html">Privacy Policy</a></li>
+            <li><a href="./terms.html">Terms &amp; Conditions</a></li>
+            <li><a href="./privacy.html#cookies">Cookie Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 DealMind AI. Built for HackwithHyderabad 3.0. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="./privacy.html">Privacy</a>
+          <a href="./terms.html">Terms</a>
+          <a href="#">Security</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════════
+     DASHBOARD VIEW
+══════════════════════════════════════════ -->
+<div id="dashboard-view" class="view-page" role="main" aria-label="DealMind AI Dashboard">
+
+  <!-- Mobile Tab Bar -->
+  <div class="mobile-tabs" role="tablist" aria-label="Dashboard panes">
+    <div class="mobile-tab-btns">
+      <button class="mobile-tab-btn active" id="mob-tab-contract" onclick="switchMobileTab('contract')" role="tab" aria-selected="true" aria-controls="pane-left">
+        <span aria-hidden="true">📄</span> Contract View
+      </button>
+      <button class="mobile-tab-btn" id="mob-tab-insights" onclick="switchMobileTab('insights')" role="tab" aria-selected="false" aria-controls="pane-right">
+        <span aria-hidden="true">🧠</span> Memory &amp; AI
+      </button>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <!-- ═══════════════════════════════
+         LEFT PANE: Contract Viewer
+    ═══════════════════════════════ -->
+    <section class="pane-left mobile-active" id="pane-left" aria-labelledby="pane-left-title" role="tabpanel">
+      <div class="pane-header">
+        <div class="pane-title" id="pane-left-title">
+          <span aria-hidden="true">📄</span> Contract Viewer
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <span class="badge badge-info" id="contract-doc-name">Datadog SaaS Renewal 2026.pdf</span>
+          <button class="btn btn-secondary btn-sm" onclick="triggerUpload()" id="upload-btn" aria-label="Upload a new contract document">
+            <span aria-hidden="true">↑</span> Upload
+          </button>
+          <input type="file" id="file-input" accept=".pdf,.txt,.docx" style="display:none" onchange="handleFileUpload(this)" aria-label="Contract file input" />
+        </div>
+      </div>
+
+      <!-- Drop Zone (hidden when contract loaded) -->
+      <div class="contract-upload-zone" id="upload-zone" style="display:none;" role="button" tabindex="0" aria-label="Drop contract file here or click to browse" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onkeydown="if(event.key==='Enter'||event.key===' ')triggerUpload()">
+        <input type="file" accept=".pdf,.txt,.docx" onchange="handleFileUpload(this)" aria-label="Browse for contract file" />
+        <div class="upload-icon" aria-hidden="true">📂</div>
+        <div class="upload-title">Drop your contract here</div>
+        <div class="upload-sub">Supports PDF, DOCX, TXT — or click to browse</div>
+      </div>
+
+      <!-- Contract Tabs -->
+      <div class="contract-tabs" role="tablist" aria-label="Contract sections">
+        <button class="contract-tab active" id="ctab-full" onclick="switchContractTab('full')" role="tab" aria-selected="true" aria-controls="contract-full">
+          <span aria-hidden="true">📄</span> Full Contract
+        </button>
+        <button class="contract-tab" id="ctab-risks" onclick="switchContractTab('risks')" role="tab" aria-selected="false" aria-controls="contract-risks">
+          <span aria-hidden="true">⚠️</span> Risk Clauses
+          <span class="badge badge-high" style="padding: 1px 6px; font-size: 0.65rem;" aria-label="4 risk clauses">4</span>
+        </button>
+        <button class="contract-tab" id="ctab-memory" onclick="switchContractTab('memory')" role="tab" aria-selected="false" aria-controls="contract-memory">
+          <span aria-hidden="true">🧠</span> Memory Hits
+          <span class="badge badge-memory" style="padding: 1px 6px; font-size: 0.65rem;" aria-label="3 memory hits">3</span>
+        </button>
+      </div>
+
+      <!-- Contract Body -->
+      <div class="pane-body" id="contract-pane-body">
+        <div id="contract-full" class="contract-content" role="tabpanel" aria-labelledby="ctab-full">
+          <!-- Contract content loaded by JS -->
+        </div>
+        <div id="contract-risks" class="contract-content" style="display:none;" role="tabpanel" aria-labelledby="ctab-risks"></div>
+        <div id="contract-memory" class="contract-content" style="display:none;" role="tabpanel" aria-labelledby="ctab-memory"></div>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="status-bar" role="status" aria-live="polite">
+        <div class="status-dot" aria-hidden="true"></div>
+        <span id="status-text">DealMind AI ready · Datadog SaaS Renewal 2026 · 2,847 words analyzed</span>
+        <span style="margin-left:auto; display:flex; align-items:center; gap:0.4rem;">
+          <span class="vendor-chip">Vendor: Datadog Inc.</span>
+        </span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         RIGHT PANE: AI Insights
+    ═══════════════════════════════ -->
+    <section class="pane-right" id="pane-right" aria-labelledby="pane-right-title" role="tabpanel">
+      <div class="pane-header">
+        <div class="pane-title" id="pane-right-title">
+          <span aria-hidden="true">🧠</span> AI Insights &amp; Negotiation Center
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <span class="badge badge-memory badge-pulse" id="memory-status-badge">Memory: Active</span>
+          <button class="btn btn-ghost btn-icon btn-sm" onclick="refreshAnalysis()" id="refresh-btn" aria-label="Refresh AI analysis" data-tooltip="Refresh analysis">
+            <span aria-hidden="true" id="refresh-icon">↻</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="right-pane-inner" role="main">
+
+        <!-- ── 1. Risk Score Card ── -->
+        <div class="risk-card" id="risk-card" aria-labelledby="risk-card-title">
+          <div class="risk-card-inner" style="position:relative; z-index:1;">
+            <div class="risk-header">
+              <div>
+                <div class="risk-title" id="risk-card-title">Risk Score &amp; Renewal Summary</div>
+                <div class="risk-score-display">
+                  <span class="risk-score-number high" id="risk-score-num" aria-label="Risk score: 74 out of 100">74</span>
+                  <span class="risk-score-label">/100</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-end;">
+                <span class="badge badge-high" id="risk-level-badge" aria-label="High risk">⬤ HIGH RISK</span>
+                <span style="font-size:0.72rem; color:var(--text-muted);">Renewal: <strong style="color:var(--risk-high);">Jan 15, 2026</strong></span>
+                <span style="font-size:0.72rem; color:var(--text-muted);">Days left: <strong style="color:var(--risk-medium);">109</strong></span>
+              </div>
+            </div>
+
+            <div class="risk-bar-wrap">
+              <div class="risk-bar-label">
+                <span>Risk Breakdown</span>
+                <span id="risk-pct-label">74% Overall</span>
+              </div>
+              <div class="risk-bar" role="progressbar" aria-valuenow="74" aria-valuemin="0" aria-valuemax="100" aria-label="Overall risk score: 74%">
+                <div class="risk-bar-fill fill-high" id="risk-bar-fill" style="width: 74%"></div>
+              </div>
+            </div>
+
+            <div class="risk-summary-items" role="list" aria-label="Risk category breakdown">
+              <div class="risk-item" role="listitem">
+                <div class="risk-item-label">Pricing Risk</div>
+                <div class="risk-item-value" style="color:var(--risk-high);">High · +32% YoY</div>
+              </div>
+              <div class="risk-item" role="listitem">
+                <div class="risk-item-label">SLA Compliance</div>
+                <div class="risk-item-value" style="color:var(--risk-medium);">Med · 2 Breaches</div>
+              </div>
+              <div class="risk-item" role="listitem">
+                <div class="risk-item-label">Liability Exposure</div>
+                <div class="risk-item-value" style="color:var(--risk-high);">High · Unlimited</div>
+              </div>
+              <div class="risk-item" role="listitem">
+                <div class="risk-item-label">Auto-Renewal Trap</div>
+                <div class="risk-item-value" style="color:var(--risk-high);">Detected · 60d</div>
+              </div>
+            </div>
+
+            <div class="insight-callout" style="margin-top:1rem;">
+              <span class="insight-callout-icon" aria-hidden="true">💡</span>
+              <span><strong>AI Insight:</strong> Historical data shows Datadog typically concedes <strong>15–22% discounts</strong> when buyers reference SLA breach history in Q4 negotiations.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 2. Demo Mode Toggle ── -->
+        <div class="demo-toggle-card" aria-labelledby="demo-toggle-title">
+          <div class="demo-toggle-header">
+            <div>
+              <div class="demo-label" id="demo-toggle-title">Demo Mode</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;" id="demo-mode-desc">
+                Without Memory: Generic baseline response
+              </div>
+            </div>
+            <label class="toggle-track" aria-label="Toggle Hindsight Memory on/off">
+              <input type="checkbox" id="memory-toggle" onchange="toggleMemoryMode(this.checked)" role="switch" aria-checked="false" />
+              <div class="toggle-slider"></div>
+            </label>
+          </div>
+
+          <div class="demo-mode-options" role="radiogroup" aria-label="Select demo interaction mode">
+            <button class="demo-option selected-without" id="demo-opt-1" onclick="selectDemoMode('without')" role="radio" aria-checked="true">
+              <div class="demo-option-title">❌ Without Memory</div>
+              <div class="demo-option-desc">Interaction 1 — Generic baseline. No historical context.</div>
+              <div class="demo-interaction-badge" style="color:var(--risk-medium);">
+                <span>●</span> Leverage: 12%
+              </div>
+            </button>
+            <button class="demo-option" id="demo-opt-2" onclick="selectDemoMode('with')" role="radio" aria-checked="false">
+              <div class="demo-option-title">✅ With Memory</div>
+              <div class="demo-option-desc">Interaction 5+ — Expert leverage. 18 months of context.</div>
+              <div class="demo-interaction-badge" style="color:var(--accent-emerald);">
+                <span>●</span> Leverage: 67%
+              </div>
+            </button>
+          </div>
+
+          <div class="demo-comparison-bar" aria-label="Leverage comparison">
+            <span class="demo-comparison-label">Leverage:</span>
+            <div class="demo-comparison-progress" role="progressbar" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" id="demo-bar-aria" aria-label="Current leverage score">
+              <div class="demo-comparison-fill" id="demo-leverage-fill" style="width:12%; background: var(--risk-medium);"></div>
+            </div>
+            <span class="demo-comparison-value" id="demo-leverage-value" style="color:var(--risk-medium);">12%</span>
+          </div>
+        </div>
+
+        <!-- ── 3. Hindsight Memory Panel ── -->
+        <div class="memory-panel" id="memory-panel" aria-labelledby="memory-panel-heading">
+          <div class="memory-panel-header">
+            <div class="memory-panel-title">
+              <span class="memory-icon" aria-hidden="true">🧠</span>
+              <span id="memory-panel-heading">Hindsight Memory</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="memory-count" id="memory-count-badge" aria-label="7 memory entries found">7 Entries</span>
+              <button class="btn btn-ghost btn-sm btn-icon" onclick="toggleMemoryExpanded()" id="memory-expand-btn" aria-label="Expand or collapse memory panel" data-tooltip="Expand all">
+                ⤢
+              </button>
+            </div>
+          </div>
+
+          <div class="memory-body" id="memory-body" aria-label="Historical negotiation memory entries">
+            <!-- Memory entries loaded by JS -->
+          </div>
+        </div>
+
+        <!-- ── 4. Counter-Offer Generator ── -->
+        <div class="counter-offer-card" aria-labelledby="counter-offer-heading">
+          <div class="counter-offer-header">
+            <div>
+              <h2 class="pane-title" id="counter-offer-heading">
+                <span aria-hidden="true">✍️</span> Counter-Offer Generator
+              </h2>
+            </div>
+            <span class="badge badge-info" id="counter-model-badge">GPT-4o + Memory</span>
+          </div>
+          <div class="counter-offer-body">
+            <div class="counter-offer-controls">
+              <select class="counter-tone-select" id="tone-select" aria-label="Select counter-offer tone">
+                <option value="assertive">⚡ Assertive</option>
+                <option value="collaborative">🤝 Collaborative</option>
+                <option value="firm">🔒 Firm &amp; Final</option>
+                <option value="exploratory">💬 Exploratory</option>
+              </select>
+              <button class="btn btn-primary" id="generate-btn" onclick="generateCounterOffer()" aria-label="Generate counter-offer email using AI">
+                <span aria-hidden="true" id="gen-btn-icon">⚡</span>
+                <span id="gen-btn-text">Generate Counter-Offer</span>
+              </button>
+            </div>
+
+            <div id="counter-output-wrap">
+              <div class="counter-offer-output" id="counter-output" aria-live="polite" aria-label="Generated counter-offer email">
+                <div class="counter-offer-placeholder" id="counter-placeholder">
+                  <div class="counter-offer-placeholder-icon" aria-hidden="true">✉️</div>
+                  <span>Click "Generate Counter-Offer" to draft your response</span>
+                  <span style="font-size:0.72rem; color:var(--text-muted);">AI will use memory context when available</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="counter-offer-actions" id="counter-actions" style="display:none;">
+              <button class="btn btn-secondary btn-sm" onclick="copyCounterOffer()" id="copy-btn" aria-label="Copy counter-offer to clipboard">
+                <span aria-hidden="true">📋</span> Copy
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="exportCounterOffer('email')" id="export-email-btn" aria-label="Export counter-offer as email draft">
+                <span aria-hidden="true">📧</span> Export Email
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="exportCounterOffer('pdf')" id="export-pdf-btn" aria-label="Export counter-offer as PDF">
+                <span aria-hidden="true">📄</span> Export PDF
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="regenerateCounterOffer()" id="regen-btn" aria-label="Regenerate counter-offer with different phrasing">
+                <span aria-hidden="true">↻</span> Regenerate
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spacing for cookie banner -->
+        <div style="height: 1rem;"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     COOKIE CONSENT BANNER
+══════════════════════════════════════════ -->
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Cookie consent" aria-describedby="cookie-desc">
+  <p class="cookie-text" id="cookie-desc">
+    <strong>🍪 Cookie Notice</strong> — We use essential cookies for core functionality and optional analytics cookies to improve your experience. Your data is processed per our <a href="./privacy.html" aria-label="Read our Privacy Policy">Privacy Policy</a>. You can change preferences at any time.
+  </p>
+  <div class="cookie-actions">
+    <button class="btn btn-ghost btn-sm" onclick="acceptCookies('essential')" id="cookie-essential-btn" aria-label="Accept essential cookies only">
+      Essential Only
+    </button>
+    <button class="btn btn-primary btn-sm" onclick="acceptCookies('all')" id="cookie-accept-btn" aria-label="Accept all cookies">
+      ✓ Accept All
+    </button>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>

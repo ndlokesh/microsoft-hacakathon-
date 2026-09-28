@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy | DealMind AI — B2B Contract Negotiation Co-Pilot</title>
+  <meta name="description" content="DealMind AI Privacy Policy — how we handle enterprise B2B data, encrypted document storage, AI processing, and your privacy rights under GDPR and CCPA." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://dealmind.ai/privacy" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- Header -->
+<header class="header" role="banner">
+  <div class="header-inner">
+    <a class="logo" href="./index.html" aria-label="DealMind AI - Home">
+      <div class="logo-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7l-9-5z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.5"/>
+          <circle cx="12" cy="11" r="2.5" fill="white"/>
+          <line x1="12" y1="6" x2="12" y2="8.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="13.5" x2="12" y2="16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">DealMind AI</span>
+    </a>
+    <nav role="navigation" aria-label="Main navigation">
+      <ul class="nav-links">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="./index.html#dashboard">Dashboard</a></li>
+        <li><a href="./privacy.html" class="active" aria-current="page">Privacy</a></li>
+        <li><a href="./terms.html">Terms</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+  <a href="./index.html">🏠 Home</a>
+  <a href="./index.html#dashboard">📊 Dashboard</a>
+  <a href="./privacy.html" aria-current="page">🔒 Privacy Policy</a>
+  <a href="./terms.html">📋 Terms &amp; Conditions</a>
+</nav>
+
+<main class="page-wrapper" role="main">
+  <div class="legal-page">
+    <div style="margin-bottom:1rem;">
+      <span class="badge badge-info">Legal Document</span>
+    </div>
+    <h1>Privacy Policy</h1>
+    <p class="last-updated">Last updated: September 28, 2026 · Version 2.1 · Effective immediately</p>
+
+    <div class="insight-callout" style="margin-bottom:2rem;">
+      <span class="insight-callout-icon" aria-hidden="true">🔒</span>
+      <span><strong>Enterprise Privacy Commitment:</strong> DealMind AI processes your contract data with AES-256 encryption, zero-retention AI inference, and full GDPR/CCPA compliance. We never sell or share your proprietary contract data with third parties.</span>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="legal-toc" aria-labelledby="toc-heading">
+      <h3 id="toc-heading">Table of Contents</h3>
+      <ol>
+        <li><a href="#scope">Scope &amp; Who We Are</a></li>
+        <li><a href="#data-we-collect">Data We Collect</a></li>
+        <li><a href="#how-we-use">How We Use Your Data</a></li>
+        <li><a href="#ai-processing">AI &amp; Machine Learning Processing</a></li>
+        <li><a href="#data-storage">Data Storage &amp; Security</a></li>
+        <li><a href="#data-sharing">Data Sharing &amp; Third Parties</a></li>
+        <li><a href="#cookies" id="cookies">Cookie Policy</a></li>
+        <li><a href="#your-rights">Your Rights (GDPR/CCPA)</a></li>
+        <li><a href="#retention">Data Retention</a></li>
+        <li><a href="#international">International Data Transfers</a></li>
+        <li><a href="#contact">Contact &amp; DPO</a></li>
+      </ol>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="legal-section" id="scope">
+      <h2>1. Scope &amp; Who We Are</h2>
+      <p>This Privacy Policy applies to DealMind AI ("we," "our," or "us"), a B2B Contract &amp; Procurement Negotiation Co-Pilot SaaS platform. DealMind AI is developed and operated for enterprise B2B use cases, including contract analysis, vendor negotiation support, and procurement intelligence.</p>
+      <p>This policy governs data collected through:</p>
+      <ul>
+        <li>The DealMind AI web platform (dealmind.ai)</li>
+        <li>API integrations with enterprise systems (ERP, CLM, Procurement platforms)</li>
+        <li>Email and support communications</li>
+        <li>HackwithHyderabad 3.0 demonstration environments</li>
+      </ul>
+      <p>By using DealMind AI, you acknowledge that you have read and understand this Privacy Policy. Enterprise customers are also subject to the Data Processing Agreement (DPA) executed at onboarding.</p>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="legal-section" id="data-we-collect">
+      <h2>2. Data We Collect</h2>
+
+      <h3>2.1 Contract &amp; Document Data</h3>
+      <p>When you upload contracts or procurement documents, we process:</p>
+      <ul>
+        <li>Document text content (contract clauses, terms, SLA specifications)</li>
+        <li>Vendor names, pricing figures, and negotiation parameters</li>
+        <li>Document metadata (filename, upload timestamp, file size)</li>
+        <li>Clause annotations and user-generated highlights</li>
+      </ul>
+
+      <h3>2.2 Negotiation History &amp; Memory Data (Hindsight Memory)</h3>
+      <p>Our Hindsight Memory feature collects and stores:</p>
+      <ul>
+        <li>Historical negotiation outcomes and vendor concession records</li>
+        <li>SLA breach logs and performance history per vendor</li>
+        <li>Price escalation patterns and benchmark comparisons</li>
+        <li>Counter-offer drafts generated by the AI system</li>
+        <li>User feedback on AI suggestions (thumbs up/down, edits)</li>
+      </ul>
+
+      <h3>2.3 Account &amp; Usage Data</h3>
+      <ul>
+        <li>Enterprise account credentials (email, SSO tokens — passwords are hashed)</li>
+        <li>User roles and permissions within your organization</li>
+        <li>Feature usage analytics (pages visited, buttons clicked, time spent)</li>
+        <li>Device information, browser type, IP address (anonymized after 30 days)</li>
+        <li>Error logs and diagnostic information</li>
+      </ul>
+
+      <h3>2.4 Communication Data</h3>
+      <ul>
+        <li>Support ticket content and correspondence</li>
+        <li>Feature requests and feedback submissions</li>
+        <li>Onboarding session recordings (with explicit consent)</li>
+      </ul>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="legal-section" id="how-we-use">
+      <h2>3. How We Use Your Data</h2>
+      <p>We use your data solely for the following purposes:</p>
+      <ul>
+        <li><strong>Service Delivery:</strong> Analyzing contracts, generating risk scores, and producing AI-powered counter-offers</li>
+        <li><strong>Hindsight Memory:</strong> Building and maintaining your organization's negotiation memory database to improve leverage over time</li>
+        <li><strong>Risk Detection:</strong> Identifying high-risk clauses, SLA vulnerabilities, and pricing anomalies</li>
+        <li><strong>Product Improvement:</strong> Improving AI model accuracy using <em>aggregated, anonymized</em> data only (you may opt out)</li>
+        <li><strong>Security:</strong> Detecting fraud, unauthorized access, and protecting platform integrity</li>
+        <li><strong>Legal Compliance:</strong> Meeting regulatory obligations under GDPR, CCPA, SOC2, and applicable enterprise procurement regulations</li>
+      </ul>
+      <p>We do <strong>not</strong> use your data for advertising, data brokerage, or sale to third parties under any circumstances.</p>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="legal-section" id="ai-processing">
+      <h2>4. AI &amp; Machine Learning Processing</h2>
+      <p>DealMind AI uses Large Language Models (LLMs) and proprietary machine learning to analyze contracts and generate counter-offers. You should know:</p>
+
+      <h3>4.1 Zero-Retention Inference</h3>
+      <p>AI inference calls (contract analysis, counter-offer generation) are processed using <strong>zero-retention APIs</strong>. Your contract text is not stored by our AI inference providers after processing is complete. We use enterprise-tier API agreements that prohibit training on customer data.</p>
+
+      <h3>4.2 Hindsight Memory Training (Opt-In Only)</h3>
+      <p>Your organizational negotiation data may be used to fine-tune your dedicated memory model with explicit opt-in consent only. This creates a <em>private, isolated memory namespace</em> for your organization — never shared across tenants.</p>
+
+      <h3>4.3 Aggregate Anonymized Insights</h3>
+      <p>We may use de-identified, aggregated benchmarks (e.g., "average SaaS price increase across platform: 18%") to improve general platform intelligence. Individual contract data is never used in aggregate benchmarks without anonymization.</p>
+
+      <h3>4.4 AI Output Disclaimer</h3>
+      <p>AI-generated counter-offers, risk scores, and recommendations are <strong>advisory only</strong> and do not constitute legal advice. All AI outputs must be reviewed by qualified legal and procurement professionals before use in live negotiations.</p>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="legal-section" id="data-storage">
+      <h2>5. Data Storage &amp; Security</h2>
+      <ul>
+        <li><strong>Encryption at Rest:</strong> All contract data encrypted with AES-256 in dedicated encrypted storage volumes</li>
+        <li><strong>Encryption in Transit:</strong> TLS 1.3 enforced for all data transmission; HSTS headers applied</li>
+        <li><strong>Access Controls:</strong> Role-based access control (RBAC), MFA enforcement, audit logging on all data access</li>
+        <li><strong>Infrastructure:</strong> SOC2 Type II compliant cloud infrastructure; regional data residency options available for EU and APAC customers</li>
+        <li><strong>Penetration Testing:</strong> Annual third-party penetration testing; results available under NDA to enterprise customers</li>
+        <li><strong>Incident Response:</strong> 72-hour breach notification commitment in compliance with GDPR Article 33</li>
+        <li><strong>Backup &amp; Recovery:</strong> Automated encrypted backups with 99.99% availability SLA; point-in-time recovery within 30 days</li>
+      </ul>
+    </div>
+
+    <!-- Section 6 -->
+    <div class="legal-section" id="data-sharing">
+      <h2>6. Data Sharing &amp; Third Parties</h2>
+      <p>We share data only in limited circumstances:</p>
+      <ul>
+        <li><strong>AI Inference Providers:</strong> Contract text is transmitted to AI API providers under zero-retention agreements. Providers: OpenAI (enterprise tier), Anthropic (enterprise tier). Both operate under GDPR-compliant DPAs.</li>
+        <li><strong>Cloud Infrastructure:</strong> AWS (primary), with data processed in your selected region</li>
+        <li><strong>Security &amp; Compliance Tools:</strong> Datadog (ironic but true) for infrastructure monitoring; Sentry for error tracking — only telemetry data, never contract content</li>
+        <li><strong>Legal Requirements:</strong> We may disclose data when required by law, court order, or valid government request, with prompt notification to affected customers where legally permitted</li>
+      </ul>
+      <p>We <strong>never</strong> sell, rent, or trade personal or business data to data brokers, advertisers, or market research firms.</p>
+    </div>
+
+    <!-- Section 7 -->
+    <div class="legal-section" id="cookies">
+      <h2>7. Cookie Policy</h2>
+
+      <h3>7.1 Essential Cookies</h3>
+      <p>Required for the platform to function. These cannot be disabled:</p>
+      <ul>
+        <li><code>dm_session</code> — Session authentication token (expires: session)</li>
+        <li><code>dm_csrf</code> — Cross-site request forgery protection (expires: session)</li>
+        <li><code>dealmind_cookie_prefs</code> — Your cookie consent preferences (expires: 1 year)</li>
+      </ul>
+
+      <h3>7.2 Analytics Cookies (Optional)</h3>
+      <p>Used to understand how users interact with the platform to improve features. Requires consent:</p>
+      <ul>
+        <li><code>dm_analytics</code> — Anonymized usage tracking (expires: 13 months)</li>
+        <li><code>dm_perf</code> — Page load performance metrics (expires: 30 days)</li>
+      </ul>
+
+      <h3>7.3 Managing Cookies</h3>
+      <p>You can manage cookie preferences at any time via our cookie consent banner or your browser settings. Disabling essential cookies will prevent platform access. You may also clear all cookies via your browser to reset preferences.</p>
+    </div>
+
+    <!-- Section 8 -->
+    <div class="legal-section" id="your-rights">
+      <h2>8. Your Rights (GDPR / CCPA)</h2>
+      <p>Depending on your jurisdiction, you have the following rights:</p>
+      <ul>
+        <li><strong>Right of Access (Art. 15 GDPR / CCPA §1798.110):</strong> Request a copy of all personal data we hold about you</li>
+        <li><strong>Right to Rectification (Art. 16 GDPR):</strong> Correct inaccurate or incomplete data</li>
+        <li><strong>Right to Erasure (Art. 17 GDPR / CCPA §1798.105):</strong> Request deletion of your personal data ("Right to be Forgotten")</li>
+        <li><strong>Right to Data Portability (Art. 20 GDPR):</strong> Export your negotiation memory data in machine-readable format (JSON/CSV)</li>
+        <li><strong>Right to Object (Art. 21 GDPR):</strong> Object to AI training on your data or processing for analytics</li>
+        <li><strong>Right to Restrict Processing (Art. 18 GDPR):</strong> Limit how we use your data in specific circumstances</li>
+        <li><strong>Opt-Out of Sale (CCPA §1798.120):</strong> We do not sell data; this right is always honored</li>
+        <li><strong>Non-Discrimination (CCPA §1798.125):</strong> Exercising privacy rights will not affect service quality or pricing</li>
+      </ul>
+      <p>To exercise any right, contact our DPO at <a href="mailto:privacy@dealmind.ai">privacy@dealmind.ai</a>. We respond within 30 days (72 hours for critical enterprise requests under SLA).</p>
+    </div>
+
+    <!-- Section 9 -->
+    <div class="legal-section" id="retention">
+      <h2>9. Data Retention</h2>
+      <ul>
+        <li><strong>Active contract data:</strong> Retained during your subscription + 90 days post-termination</li>
+        <li><strong>Hindsight Memory entries:</strong> Retained for the lifetime of your enterprise subscription; exported and deleted upon request</li>
+        <li><strong>AI inference logs:</strong> Zero retention — purged immediately after processing</li>
+        <li><strong>Usage analytics:</strong> Anonymized after 30 days; retained in aggregate form for 24 months</li>
+        <li><strong>Support tickets:</strong> 3 years from resolution date</li>
+        <li><strong>Billing records:</strong> 7 years (legal/tax compliance)</li>
+        <li><strong>Security audit logs:</strong> 12 months (immutable)</li>
+      </ul>
+    </div>
+
+    <!-- Section 10 -->
+    <div class="legal-section" id="international">
+      <h2>10. International Data Transfers</h2>
+      <p>If you are located in the European Economic Area (EEA) or United Kingdom, your data may be transferred to and processed in countries outside the EEA. We ensure such transfers are protected by:</p>
+      <ul>
+        <li>Standard Contractual Clauses (SCCs) approved by the European Commission</li>
+        <li>EU-U.S. Data Privacy Framework (DPF) certification for U.S. transfers</li>
+        <li>Data Processing Agreements with all sub-processors</li>
+        <li>Regional data residency options: EU-West (Ireland), APAC (Singapore), US-East</li>
+      </ul>
+    </div>
+
+    <!-- Section 11 -->
+    <div class="legal-section" id="contact">
+      <h2>11. Contact &amp; Data Protection Officer</h2>
+      <p>For privacy-related queries, data subject requests, or to reach our Data Protection Officer:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:privacy@dealmind.ai">privacy@dealmind.ai</a></li>
+        <li><strong>DPO:</strong> <a href="mailto:dpo@dealmind.ai">dpo@dealmind.ai</a></li>
+        <li><strong>Response SLA:</strong> 30 days (standard) · 72 hours (enterprise SLA)</li>
+        <li><strong>Postal:</strong> DealMind AI, Legal &amp; Privacy Team, [Registered Address]</li>
+        <li><strong>Supervisory Authority:</strong> EU residents may lodge complaints with their national data protection authority</li>
+      </ul>
+      <p>If you believe we have not adequately addressed your privacy concern, you have the right to file a complaint with your local Data Protection Authority (DPA).</p>
+    </div>
+
+    <div style="padding:1.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); margin-top:2rem;">
+      <p style="font-size:0.82rem; color:var(--text-muted);">This Privacy Policy was last updated on September 28, 2026. We will notify enterprise customers of material changes via email at least 30 days before they take effect. Continued use of DealMind AI after the effective date constitutes acceptance of the updated policy.</p>
+      <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
+        <a href="./terms.html" class="btn btn-secondary btn-sm">View Terms &amp; Conditions</a>
+        <a href="./index.html" class="btn btn-ghost btn-sm">← Back to Home</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Cookie Banner -->
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Cookie consent">
+  <p class="cookie-text">
+    <strong>🍪 Cookie Notice</strong> — We use cookies to keep you logged in and improve your experience. <a href="#cookies">Cookie Policy</a>
+  </p>
+  <div class="cookie-actions">
+    <button class="btn btn-ghost btn-sm" onclick="acceptCookies('essential')" id="cookie-essential-btn">Essential Only</button>
+    <button class="btn btn-primary btn-sm" onclick="acceptCookies('all')" id="cookie-accept-btn">✓ Accept All</button>
+  </div>
+</div>
+
+<script>
+  // Hamburger toggle
+  document.getElementById('hamburger').addEventListener('click', function() {
+    const nav = document.getElementById('mobile-nav');
+    const isOpen = nav.classList.toggle('open');
+    this.classList.toggle('open', isOpen);
+    this.setAttribute('aria-expanded', isOpen);
+  });
+
+  // Cookie consent
+  function acceptCookies(type) {
+    localStorage.setItem('dealmind_cookie_prefs', JSON.stringify({ type, timestamp: new Date().toISOString() }));
+    const banner = document.getElementById('cookie-banner');
+    banner.classList.remove('visible');
+    setTimeout(() => banner.remove(), 400);
+  }
+
+  // Check cookie prefs
+  if (!localStorage.getItem('dealmind_cookie_prefs')) {
+    setTimeout(() => document.getElementById('cookie-banner').classList.add('visible'), 800);
+  }
+
+  // Toast
+  function showToast(msg, type) {
+    const tc = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.setAttribute('role', 'alert');
+    t.textContent = msg;
+    tc.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
+  }
+</script>
+</body>
+</html>

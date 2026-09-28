@@ -1,0 +1,28 @@
+{
+  "name": "DealMind AI",
+  "short_name": "DealMind",
+  "description": "B2B Contract & Procurement Negotiation Co-Pilot powered by Hindsight Memory",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#10B981",
+  "orientation": "any",
+  "lang": "en",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./og-preview.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "label": "DealMind AI Dashboard"
+    }
+  ]
+}
