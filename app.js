@@ -1450,22 +1450,12 @@ function downloadRedlinePDF() {
 function closeModal(id, event) {
   if (event && event.target !== event.currentTarget) return; // Only close on backdrop click
   const modal = document.getElementById(id);
-  if (modal) modal.classList.remove('open');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
   document.body.style.overflow = '';
 }
-
-// Close modals on Escape key
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    ['roi-modal', 'slack-modal', 'email-modal'].forEach(id => {
-      const m = document.getElementById(id);
-      if (m && m.classList.contains('open')) {
-        m.classList.remove('open');
-        document.body.style.overflow = '';
-      }
-    });
-  }
-});
 
 // ══════════════════════════════════════════════════════
 // PATCH: extend switchContractTab for matrix tab
@@ -1480,11 +1470,618 @@ switchContractTab = function(tab) {
   if (matrixPanel) matrixPanel.style.display = tab === 'matrix' ? '' : 'none';
   // Render matrix lazily
   if (tab === 'matrix') renderVendorMatrix();
+  // Clear any existing search filter when switching tabs
+  clearContractSearch();
 };
 
 const _origRenderContractContent = renderContractContent;
 renderContractContent = function() {
   _origRenderContractContent();
-  // matrix is rendered lazily on tab click
+  updateLiveMetrics();
 };
+
+// ══════════════════════════════════════════════════════
+// COMMAND PALETTE (Ctrl+K)
+// ══════════════════════════════════════════════════════
+
+const cmdItems = [
+  { id: 'dash', title: 'Open Contract Dashboard', desc: 'Jump to the main procurement analysis workspace', icon: '🚀', badge: 'Alt+D', action: () => showView('dashboard') },
+  { id: 'home', title: 'Go to Landing Page', desc: 'View DealMind AI features and overview', icon: '🏠', badge: 'Alt+H', action: () => showView('landing') },
+  { id: 'memory', title: 'Toggle Hindsight Memory Mode', desc: 'Enable/disable 7 historical memory anchors', icon: '🧠', badge: 'Ctrl+M', action: () => { showView('dashboard'); const t = document.getElementById('memory-toggle'); if(t){ t.checked = !t.checked; toggleMemoryMode(); } } },
+  { id: 'gen', title: 'Generate AI Counter-Offer', desc: 'Craft a data-backed negotiation draft with cited clauses', icon: '⚡', badge: 'Ctrl+G', action: () => { showView('dashboard'); generateCounterOffer(); } },
+  { id: 'redline', title: 'Toggle Redline Contract View', desc: 'Inspect diff with proposed strike-throughs & insertions', icon: '📝', badge: 'Ctrl+E', action: () => { showView('dashboard'); toggleRedlineView(); } },
+  { id: 'roi', title: 'Calculate Procurement ROI', desc: 'Estimate annual savings based on total SaaS spend', icon: '📊', badge: 'Ctrl+I', action: () => openRoiCalculator() },
+  { id: 'slack', title: 'Send Alert to Slack Channel', desc: 'Notify procurement team on #procurement-alerts', icon: '💬', badge: '', action: () => openSlackModal() },
+  { id: 'email', title: 'Export Email Draft', desc: 'Open email export dialog with pre-filled message', icon: '✉️', badge: '', action: () => openEmailModal() },
+  { id: 'tab-full', title: 'View Full Contract', desc: 'Show complete contract clauses and text', icon: '📄', badge: 'Ctrl+1', action: () => { showView('dashboard'); switchContractTab('full'); } },
+  { id: 'tab-risks', title: 'View Risk Clauses', desc: 'Focus on high and medium risk contract clauses', icon: '⚠️', badge: 'Ctrl+2', action: () => { showView('dashboard'); switchContractTab('risks'); } },
+  { id: 'tab-mem', title: 'View Memory Hits', desc: 'Filter contract to clauses with matching historical data', icon: '🔍', badge: 'Ctrl+3', action: () => { showView('dashboard'); switchContractTab('memory'); } },
+  { id: 'tab-matrix', title: 'View Vendor Benchmark Matrix', desc: 'Compare 3-year pricing and SLA trends across renewals', icon: '📈', badge: 'Ctrl+4', action: () => { showView('dashboard'); switchContractTab('matrix'); } },
+  { id: 'tone-assert', title: 'Set Tone: Assertive', desc: 'Firm, leverage-first tone citing SLA and price precedents', icon: '⚡', badge: '', action: () => setCounterTone('assertive') },
+  { id: 'tone-collab', title: 'Set Tone: Collaborative', desc: 'Partnership-oriented tone seeking mutual compromise', icon: '🤝', badge: '', action: () => setCounterTone('collaborative') },
+  { id: 'tone-firm', title: 'Set Tone: Firm & Final', desc: 'Decisive, take-it-or-leave-it executive posture', icon: '🔒', badge: '', action: () => setCounterTone('firm') },
+  { id: 'tone-explor', title: 'Set Tone: Exploratory', desc: 'Probing tone testing vendor concession flexibility', icon: '💬', badge: '', action: () => setCounterTone('exploratory') },
+  { id: 'tour', title: 'Take Product Tour', desc: 'Interactive step-by-step walkthrough of DealMind AI', icon: '🎓', badge: '', action: () => startOnboardingTour() },
+  { id: 'settings', title: 'Open Settings & Preferences', desc: 'Customize display, AI behavior, and data options', icon: '⚙️', badge: 'Ctrl+,', action: () => openSettings() },
+  { id: 'help', title: 'Keyboard Shortcuts Reference', desc: 'View all keyboard shortcuts and navigation tips', icon: '⌨️', badge: '?', action: () => openHelp() },
+  { id: 'copy', title: 'Copy Current Counter-Offer', desc: 'Copy the generated negotiation letter to clipboard', icon: '📋', badge: '', action: () => copyCounterOffer() },
+  { id: 'refresh', title: 'Refresh Contract Analysis', desc: 'Re-run autonomous clause extraction & risk scoring', icon: '🔄', badge: '', action: () => refreshAnalysis() }
+];
+
+let activeCmdIndex = 0;
+let filteredCommands = [...cmdItems];
+
+function openCommandPalette() {
+  const modal = document.getElementById('cmd-palette');
+  const input = document.getElementById('cmd-input');
+  if (!modal) return;
+  modal.classList.add('open');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  if (input) {
+    input.value = '';
+    filterCommands('');
+    setTimeout(() => input.focus(), 50);
+  }
+}
+
+function filterCommands(query) {
+  const q = (query || '').toLowerCase().trim();
+  filteredCommands = cmdItems.filter(item => 
+    item.title.toLowerCase().includes(q) || 
+    item.desc.toLowerCase().includes(q) ||
+    (item.badge && item.badge.toLowerCase().includes(q))
+  );
+  activeCmdIndex = 0;
+  renderCommandResults();
+}
+
+function renderCommandResults() {
+  const container = document.getElementById('cmd-results');
+  if (!container) return;
+  if (filteredCommands.length === 0) {
+    container.innerHTML = `<div class="cmd-empty">No matching commands found.</div>`;
+    return;
+  }
+  container.innerHTML = filteredCommands.map((item, index) => `
+    <div class="cmd-item ${index === activeCmdIndex ? 'active' : ''}" 
+         role="option" 
+         aria-selected="${index === activeCmdIndex}"
+         onclick="executeCommand(${index})"
+         onmouseenter="setActiveCmd(${index})">
+      <span class="cmd-item-icon" aria-hidden="true">${item.icon}</span>
+      <div class="cmd-item-text">
+        <div class="cmd-item-title">${item.title}</div>
+        <div class="cmd-item-desc">${item.desc}</div>
+      </div>
+      ${item.badge ? `<kbd class="cmd-item-badge">${item.badge}</kbd>` : ''}
+    </div>
+  `).join('');
+}
+
+function setActiveCmd(index) {
+  activeCmdIndex = index;
+  const items = document.querySelectorAll('.cmd-item');
+  items.forEach((el, i) => {
+    el.classList.toggle('active', i === index);
+    el.setAttribute('aria-selected', i === index ? 'true' : 'false');
+  });
+}
+
+function executeCommand(index) {
+  const cmd = filteredCommands[index];
+  if (!cmd) return;
+  const palette = document.getElementById('cmd-palette');
+  if (palette) {
+    palette.classList.remove('open');
+    palette.style.display = 'none';
+  }
+  document.body.style.overflow = '';
+  cmd.action();
+}
+
+function setCounterTone(tone) {
+  const toneSelect = document.getElementById('tone-select');
+  if (toneSelect) {
+    toneSelect.value = tone;
+    showToast(`Negotiation tone set to: ${tone.toUpperCase()}`, 'info');
+    generateCounterOffer();
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// CONTRACT CLAUSE LIVE SEARCH (Ctrl+F)
+// ══════════════════════════════════════════════════════
+
+function searchContract(query) {
+  const q = (query || '').toLowerCase().trim();
+  const clearBtn = document.getElementById('search-clear-btn');
+  const countEl = document.getElementById('search-results-count');
+  const clauseBlocks = document.querySelectorAll('#contract-content .contract-clause-block');
+
+  if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+
+  if (!q) {
+    clauseBlocks.forEach(block => {
+      block.style.display = '';
+      const marks = block.querySelectorAll('.search-highlight');
+      marks.forEach(m => {
+        m.replaceWith(document.createTextNode(m.textContent));
+      });
+    });
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+
+  let matchCount = 0;
+  clauseBlocks.forEach(block => {
+    // Reset previous highlights before searching
+    const existingMarks = block.querySelectorAll('.search-highlight');
+    existingMarks.forEach(m => {
+      m.replaceWith(document.createTextNode(m.textContent));
+    });
+
+    const text = block.textContent.toLowerCase();
+    if (text.includes(q)) {
+      block.style.display = '';
+      matchCount++;
+      highlightTextInElement(block, query);
+    } else {
+      block.style.display = 'none';
+    }
+  });
+
+  if (countEl) {
+    countEl.textContent = matchCount === 0 ? '0 matches' : `${matchCount} found`;
+  }
+}
+
+function highlightTextInElement(element, query) {
+  if (!query) return;
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+  const textNodes = [];
+  while (walker.nextNode()) {
+    const parent = walker.currentNode.parentElement;
+    if (parent && !parent.classList.contains('clause-tag') && !parent.classList.contains('clause-num') && !parent.classList.contains('clause-badge')) {
+      textNodes.push(walker.currentNode);
+    }
+  }
+
+  const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+  textNodes.forEach(node => {
+    if (regex.test(node.nodeValue)) {
+      const span = document.createElement('span');
+      span.innerHTML = node.nodeValue.replace(regex, '<mark class="search-highlight">$1</mark>');
+      node.replaceWith(...span.childNodes);
+    }
+  });
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function clearContractSearch() {
+  const input = document.getElementById('contract-search-input');
+  if (input) input.value = '';
+  searchContract('');
+}
+
+// ══════════════════════════════════════════════════════
+// LIVE METRICS STRIP
+// ══════════════════════════════════════════════════════
+
+function updateLiveMetrics() {
+  const lmRisk = document.getElementById('lm-risk');
+  const lmClauses = document.getElementById('lm-clauses');
+  const lmMemory = document.getElementById('lm-memory');
+  const lmDays = document.getElementById('lm-days');
+  const lmSavings = document.getElementById('lm-savings');
+
+  if (lmRisk) {
+    lmRisk.textContent = state.memoryMode ? '48' : '74';
+    lmRisk.style.color = state.memoryMode ? 'var(--accent-emerald-light)' : 'var(--risk-high)';
+  }
+  if (lmClauses) lmClauses.textContent = (typeof sampleClauses !== 'undefined' && sampleClauses.length) || '8';
+  if (lmMemory) lmMemory.textContent = state.memoryMode ? '7' : '0';
+  if (lmDays) lmDays.textContent = (typeof sampleContract !== 'undefined' && sampleContract.daysUntilRenewal) ? sampleContract.daysUntilRenewal : '109';
+  if (lmSavings) lmSavings.textContent = state.memoryMode ? '$143K' : '$35K';
+}
+
+// Extend toggleMemoryMode to keep live metrics updated
+const _origToggleMemoryMode = toggleMemoryMode;
+toggleMemoryMode = function() {
+  _origToggleMemoryMode();
+  updateLiveMetrics();
+};
+
+// ══════════════════════════════════════════════════════
+// SETTINGS DRAWER & ELASTIC USER PREFERENCES
+// ══════════════════════════════════════════════════════
+
+const DEFAULT_SETTINGS = {
+  fontSize: 'md',
+  reduceMotion: false,
+  compactView: false,
+  autoMemory: false,
+  defaultTone: 'assertive',
+  toasts: true,
+  autosave: true
+};
+
+let userSettings = { ...DEFAULT_SETTINGS };
+
+function loadSettings() {
+  try {
+    const saved = localStorage.getItem('dealmind_user_settings');
+    if (saved) {
+      userSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+    }
+  } catch(e) {
+    userSettings = { ...DEFAULT_SETTINGS };
+  }
+  applySettingsToDOM();
+}
+
+function applySettingsToDOM() {
+  setFontSize(userSettings.fontSize, false);
+  applyReduceMotion(userSettings.reduceMotion, false);
+  applyCompactView(userSettings.compactView, false);
+
+  const reduceCheck = document.getElementById('setting-reduce-motion');
+  if (reduceCheck) reduceCheck.checked = userSettings.reduceMotion;
+
+  const compactCheck = document.getElementById('setting-compact');
+  if (compactCheck) compactCheck.checked = userSettings.compactView;
+
+  const autoMemCheck = document.getElementById('setting-auto-memory');
+  if (autoMemCheck) autoMemCheck.checked = userSettings.autoMemory;
+
+  const toneSel = document.getElementById('setting-default-tone');
+  if (toneSel) toneSel.value = userSettings.defaultTone;
+
+  const toastsCheck = document.getElementById('setting-toasts');
+  if (toastsCheck) toastsCheck.checked = userSettings.toasts;
+
+  const autosaveCheck = document.getElementById('setting-autosave');
+  if (autosaveCheck) autosaveCheck.checked = userSettings.autosave;
+
+  // If auto-memory is enabled and memory is off, enable it on dashboard
+  if (userSettings.autoMemory && !state.memoryMode) {
+    const memToggle = document.getElementById('memory-toggle');
+    if (memToggle) {
+      memToggle.checked = true;
+      toggleMemoryMode();
+    }
+  }
+}
+
+function openSettings() {
+  const overlay = document.getElementById('settings-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeSettings(event) {
+  if (event && event.target && event.target.id !== 'settings-overlay' && !event.target.classList.contains('modal-close') && event.target.tagName !== 'BUTTON') {
+    return;
+  }
+  const overlay = document.getElementById('settings-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+function setFontSize(size, save = true) {
+  ['font-sm', 'font-md', 'font-lg'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.toggle('active', id === `font-${size}`);
+  });
+  document.documentElement.setAttribute('data-font-size', size);
+  userSettings.fontSize = size;
+  if (save && userSettings.autosave) persistSettings();
+}
+
+function applyReduceMotion(enabled, save = true) {
+  document.body.classList.toggle('reduce-motion', !!enabled);
+  userSettings.reduceMotion = !!enabled;
+  if (save && userSettings.autosave) persistSettings();
+}
+
+function applyCompactView(enabled, save = true) {
+  document.body.classList.toggle('compact-mode', !!enabled);
+  userSettings.compactView = !!enabled;
+  if (save && userSettings.autosave) persistSettings();
+}
+
+function saveSettings() {
+  const autoMemCheck = document.getElementById('setting-auto-memory');
+  const toneSel = document.getElementById('setting-default-tone');
+  const toastsCheck = document.getElementById('setting-toasts');
+  const autosaveCheck = document.getElementById('setting-autosave');
+
+  if (autoMemCheck) userSettings.autoMemory = autoMemCheck.checked;
+  if (toneSel) userSettings.defaultTone = toneSel.value;
+  if (toastsCheck) userSettings.toasts = toastsCheck.checked;
+  if (autosaveCheck) userSettings.autosave = autosaveCheck.checked;
+
+  persistSettings();
+  const overlay = document.getElementById('settings-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  showToast('Preferences saved successfully!', 'success');
+}
+
+function persistSettings() {
+  try {
+    localStorage.setItem('dealmind_user_settings', JSON.stringify(userSettings));
+  } catch(e) {}
+}
+
+function clearAllData() {
+  if (confirm('Clear all stored settings, session state, and onboarding status?')) {
+    try {
+      localStorage.clear();
+    } catch(e) {}
+    userSettings = { ...DEFAULT_SETTINGS };
+    applySettingsToDOM();
+    showToast('All local data cleared successfully.', 'info');
+  }
+}
+
+function exportSettings() {
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(userSettings, null, 2));
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute('href', dataStr);
+  dlAnchor.setAttribute('download', 'dealmind-preferences.json');
+  dlAnchor.click();
+  showToast('Settings exported as JSON file.', 'success');
+}
+
+// ══════════════════════════════════════════════════════
+// ONBOARDING TOUR (First Time & On-Demand)
+// ══════════════════════════════════════════════════════
+
+let currentOnboardingStep = 1;
+
+function checkFirstVisit() {
+  try {
+    const onboarded = localStorage.getItem('dealmind_onboarded');
+    if (!onboarded) {
+      setTimeout(() => startOnboardingTour(), 700);
+    }
+  } catch(e) {}
+}
+
+function startOnboardingTour() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (!overlay) return;
+  currentOnboardingStep = 1;
+  updateOnboardingView();
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function updateOnboardingView() {
+  for (let i = 1; i <= 4; i++) {
+    const stepEl = document.getElementById(`ob-step-${i}`);
+    const dotEl = document.getElementById(`ob-dot-${i}`);
+    if (stepEl) stepEl.classList.toggle('active', i === currentOnboardingStep);
+    if (dotEl) dotEl.classList.toggle('active', i === currentOnboardingStep);
+  }
+  const fill = document.getElementById('ob-progress-fill');
+  const bar = document.getElementById('ob-progress-bar');
+  if (fill) fill.style.width = `${currentOnboardingStep * 25}%`;
+  if (bar) bar.setAttribute('aria-valuenow', currentOnboardingStep);
+
+  const nextBtn = document.getElementById('ob-next-btn');
+  if (nextBtn) {
+    nextBtn.textContent = currentOnboardingStep === 4 ? 'Get Started ✨' : 'Next →';
+  }
+}
+
+function nextOnboardingStep() {
+  if (currentOnboardingStep < 4) {
+    currentOnboardingStep++;
+    updateOnboardingView();
+  } else {
+    closeOnboarding();
+  }
+}
+
+function closeOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+  try {
+    localStorage.setItem('dealmind_onboarded', 'true');
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════
+// HELP & SHORTCUTS MODAL
+// ══════════════════════════════════════════════════════
+
+function openHelp() {
+  const modal = document.getElementById('help-modal');
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// SESSION RESTORE BANNER
+// ══════════════════════════════════════════════════════
+
+function checkSessionRestore() {
+  try {
+    const lastSession = localStorage.getItem('dealmind_saved_session');
+    if (lastSession) {
+      const banner = document.getElementById('session-restore-banner');
+      if (banner) {
+        banner.style.display = 'flex';
+        setTimeout(() => dismissRestoreBanner(), 6000);
+      }
+    } else {
+      localStorage.setItem('dealmind_saved_session', Date.now().toString());
+    }
+  } catch(e) {}
+}
+
+function dismissRestoreBanner() {
+  const banner = document.getElementById('session-restore-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════
+// GLOBAL KEYBOARD SHORTCUTS & EVENT LISTENERS
+// ══════════════════════════════════════════════════════
+
+document.addEventListener('keydown', (e) => {
+  const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+
+  // Command palette navigation when open
+  const palette = document.getElementById('cmd-palette');
+  const paletteOpen = palette && (palette.classList.contains('open') || palette.style.display === 'flex');
+
+  if (paletteOpen) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeCmdIndex = (activeCmdIndex + 1) % (filteredCommands.length || 1);
+      setActiveCmd(activeCmdIndex);
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeCmdIndex = (activeCmdIndex - 1 + filteredCommands.length) % (filteredCommands.length || 1);
+      setActiveCmd(activeCmdIndex);
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      executeCommand(activeCmdIndex);
+      return;
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeModal('cmd-palette');
+      palette.style.display = 'none';
+      return;
+    }
+  }
+
+  // Ctrl+K or Cmd+K: Command Palette
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    if (paletteOpen) {
+      closeModal('cmd-palette');
+      palette.style.display = 'none';
+    } else {
+      openCommandPalette();
+    }
+    return;
+  }
+
+  // Ctrl+, or Cmd+,: Settings
+  if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+    e.preventDefault();
+    openSettings();
+    return;
+  }
+
+  // ? key (without Ctrl/Alt) outside input: Help
+  if (e.key === '?' && !isInput && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    e.preventDefault();
+    openHelp();
+    return;
+  }
+
+  // Escape closes all open dialogs & overlays
+  if (e.key === 'Escape') {
+    ['roi-modal', 'slack-modal', 'email-modal', 'help-modal', 'cmd-palette'].forEach(id => {
+      const m = document.getElementById(id);
+      if (m && (m.classList.contains('open') || m.style.display === 'flex')) {
+        m.classList.remove('open');
+        m.style.display = 'none';
+      }
+    });
+    const settings = document.getElementById('settings-overlay');
+    if (settings) settings.style.display = 'none';
+    const ob = document.getElementById('onboarding-overlay');
+    if (ob) ob.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // Navigation shortcuts
+  if (e.altKey && e.key.toLowerCase() === 'd') {
+    e.preventDefault();
+    showView('dashboard');
+    return;
+  }
+  if (e.altKey && e.key.toLowerCase() === 'h') {
+    e.preventDefault();
+    showView('landing');
+    return;
+  }
+
+  // Dashboard AI shortcuts (Ctrl+G, Ctrl+M, Ctrl+E, Ctrl+I, Ctrl+1..4)
+  if ((e.ctrlKey || e.metaKey) && !isInput) {
+    if (e.key.toLowerCase() === 'g') {
+      e.preventDefault();
+      generateCounterOffer();
+      return;
+    }
+    if (e.key.toLowerCase() === 'm') {
+      e.preventDefault();
+      const toggle = document.getElementById('memory-toggle');
+      if (toggle) {
+        toggle.checked = !toggle.checked;
+        toggleMemoryMode();
+      }
+      return;
+    }
+    if (e.key.toLowerCase() === 'e') {
+      e.preventDefault();
+      toggleRedlineView();
+      return;
+    }
+    if (e.key.toLowerCase() === 'i') {
+      e.preventDefault();
+      openRoiCalculator();
+      return;
+    }
+    if (e.key === '1') { e.preventDefault(); switchContractTab('full'); return; }
+    if (e.key === '2') { e.preventDefault(); switchContractTab('risks'); return; }
+    if (e.key === '3') { e.preventDefault(); switchContractTab('memory'); return; }
+    if (e.key === '4') { e.preventDefault(); switchContractTab('matrix'); return; }
+    if (e.key.toLowerCase() === 'f') {
+      const searchInp = document.getElementById('contract-search-input');
+      if (searchInp) {
+        e.preventDefault();
+        searchInp.focus();
+        searchInp.select();
+        return;
+      }
+    }
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// INITIALIZATION HOOKS
+// ══════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  updateLiveMetrics();
+  checkFirstVisit();
+  checkSessionRestore();
+});
+
 

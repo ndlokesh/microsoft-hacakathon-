@@ -124,6 +124,16 @@
 
     <div class="nav-actions">
       <span class="nav-hackathon-badge" aria-label="HackWithHyderabad 3.0 submission">⚡ HackwithHyd 3.0</span>
+      <button class="btn btn-ghost btn-sm" onclick="openCommandPalette()" id="cmd-palette-btn" aria-label="Open command palette (Ctrl+K)" title="Ctrl+K">
+        <span aria-hidden="true">🔍</span> Search
+        <kbd style="font-size:0.6rem;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:1px 5px;margin-left:4px;">Ctrl K</kbd>
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="openSettings()" id="settings-btn" aria-label="Open settings panel">
+        <span aria-hidden="true">⚙️</span>
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="openHelp()" id="help-btn" aria-label="Open keyboard shortcuts and help">
+        <span aria-hidden="true">?</span>
+      </button>
       <button class="btn btn-primary btn-sm" onclick="showView('dashboard')" id="try-demo-btn">
         Try Demo
       </button>
@@ -336,6 +346,22 @@
         </div>
       </div>
 
+      <!-- Contract Search Bar -->
+      <div class="contract-search-bar" id="contract-search-wrap" role="search">
+        <span class="contract-search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          class="contract-search-input"
+          id="contract-search-input"
+          placeholder="Search clauses, sections, terms..."
+          aria-label="Search contract clauses"
+          oninput="searchContract(this.value)"
+          autocomplete="off"
+        />
+        <button class="contract-search-clear" id="search-clear-btn" onclick="clearContractSearch()" aria-label="Clear search" style="display:none;">✕</button>
+        <span class="contract-search-results" id="search-results-count" aria-live="polite"></span>
+      </div>
+
       <!-- Drop Zone (hidden when contract loaded) -->
       <div class="contract-upload-zone" id="upload-zone" style="display:none;" role="button" tabindex="0" aria-label="Drop contract file here or click to browse" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onkeydown="if(event.key==='Enter'||event.key===' ')triggerUpload()">
         <input type="file" accept=".pdf,.txt,.docx" onchange="handleFileUpload(this)" aria-label="Browse for contract file" />
@@ -424,6 +450,35 @@
             <span aria-hidden="true" id="refresh-icon">↻</span>
           </button>
         </div>
+      </div>
+
+      <!-- Live Metrics Strip -->
+      <div class="live-metrics-strip" id="live-metrics-strip" role="region" aria-label="Live analysis metrics">
+        <div class="live-metric">
+          <span class="live-metric-val" id="lm-risk">74</span>
+          <span class="live-metric-lbl">Risk Score</span>
+        </div>
+        <div class="live-metric-div"></div>
+        <div class="live-metric">
+          <span class="live-metric-val" id="lm-clauses">8</span>
+          <span class="live-metric-lbl">Clauses</span>
+        </div>
+        <div class="live-metric-div"></div>
+        <div class="live-metric">
+          <span class="live-metric-val" id="lm-memory">7</span>
+          <span class="live-metric-lbl">Memory Hits</span>
+        </div>
+        <div class="live-metric-div"></div>
+        <div class="live-metric">
+          <span class="live-metric-val" id="lm-days">109</span>
+          <span class="live-metric-lbl">Days Left</span>
+        </div>
+        <div class="live-metric-div"></div>
+        <div class="live-metric">
+          <span class="live-metric-val" id="lm-savings" style="color:var(--accent-emerald-light);">$143K</span>
+          <span class="live-metric-lbl">Potential Save</span>
+        </div>
+        <div class="live-metrics-pulse" aria-hidden="true"></div>
       </div>
 
       <div class="right-pane-inner" role="main">
@@ -644,8 +699,263 @@
 </div>
 
 <!-- ══════════════════════════════════════════
-     COOKIE CONSENT BANNER
+     SESSION RESTORE BANNER
 ══════════════════════════════════════════ -->
+<div class="session-restore-banner" id="session-restore-banner" style="display:none;" role="alert" aria-live="assertive">
+  <span>💾 Previous session found — Memory mode &amp; tone settings restored.</span>
+  <div style="display:flex; gap:0.5rem; flex-shrink:0;">
+    <button class="btn btn-secondary btn-sm" onclick="dismissRestoreBanner()" aria-label="Dismiss restore notice">Got it</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ONBOARDING OVERLAY (First Time)
+══════════════════════════════════════════ -->
+<div class="onboarding-overlay" id="onboarding-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+  <div class="onboarding-box">
+    <div class="onboarding-progress" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" id="ob-progress-bar">
+      <div class="onboarding-progress-fill" id="ob-progress-fill" style="width:25%;"></div>
+    </div>
+    <div class="onboarding-steps">
+      <!-- Step 1 -->
+      <div class="onboarding-step active" id="ob-step-1">
+        <div class="onboarding-emoji">🧠</div>
+        <h2 class="onboarding-title" id="onboarding-title">Welcome to DealMind AI</h2>
+        <p class="onboarding-desc">Your autonomous B2B procurement co-pilot. We use <strong>Hindsight Memory</strong> to recall every past SLA breach, vendor concession, and pricing pattern — giving you expert leverage in every negotiation.</p>
+        <div class="onboarding-chips">
+          <span class="ob-chip">📄 Contract Analysis</span>
+          <span class="ob-chip">⚡ Counter-Offer AI</span>
+          <span class="ob-chip">📊 ROI Tracking</span>
+        </div>
+      </div>
+      <!-- Step 2 -->
+      <div class="onboarding-step" id="ob-step-2">
+        <div class="onboarding-emoji">🔍</div>
+        <h2 class="onboarding-title">Search &amp; Filter Instantly</h2>
+        <p class="onboarding-desc">Use the <strong>Search bar</strong> in the Contract Viewer to filter clauses in real time. Press <kbd>Ctrl+K</kbd> from anywhere to open the Command Palette and jump to any action instantly.</p>
+        <div class="onboarding-chips">
+          <span class="ob-chip">🔍 Live Clause Search</span>
+          <span class="ob-chip">⌘ Command Palette</span>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div class="onboarding-step" id="ob-step-3">
+        <div class="onboarding-emoji">📊</div>
+        <h2 class="onboarding-title">Memory &amp; Vendor Intelligence</h2>
+        <p class="onboarding-desc">Toggle <strong>Hindsight Memory</strong> to see 7 historical entries. Switch to <strong>Timeline view</strong> to trace every event node. Check the <strong>Vendor Matrix</strong> tab for 3-year renewal comparisons.</p>
+        <div class="onboarding-chips">
+          <span class="ob-chip">🧠 Memory Timeline</span>
+          <span class="ob-chip">📊 Vendor Matrix</span>
+        </div>
+      </div>
+      <!-- Step 4 -->
+      <div class="onboarding-step" id="ob-step-4">
+        <div class="onboarding-emoji">✨</div>
+        <h2 class="onboarding-title">You're Ready to Negotiate!</h2>
+        <p class="onboarding-desc">Generate an AI counter-offer, export a <strong>redlined contract</strong>, send a <strong>Slack alert</strong>, or calculate your <strong>ROI</strong>. Settings and shortcuts are always available from the top nav.</p>
+        <div class="onboarding-chips">
+          <span class="ob-chip">⚙️ Settings</span>
+          <span class="ob-chip">⌨️ Shortcuts</span>
+          <span class="ob-chip">💾 Auto-Save</span>
+        </div>
+      </div>
+    </div>
+    <div class="onboarding-footer">
+      <div class="onboarding-dots" aria-hidden="true">
+        <span class="ob-dot active" id="ob-dot-1"></span>
+        <span class="ob-dot" id="ob-dot-2"></span>
+        <span class="ob-dot" id="ob-dot-3"></span>
+        <span class="ob-dot" id="ob-dot-4"></span>
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <button class="btn btn-ghost btn-sm" id="ob-skip-btn" onclick="closeOnboarding()" aria-label="Skip onboarding tour">Skip</button>
+        <button class="btn btn-primary btn-sm" id="ob-next-btn" onclick="nextOnboardingStep()" aria-label="Next onboarding step">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     COMMAND PALETTE (Ctrl+K)
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="cmd-palette" role="dialog" aria-modal="true" aria-label="Command palette" onclick="closeModal('cmd-palette',event)" style="align-items:flex-start; padding-top:12vh;">
+  <div class="modal-box" style="max-width:560px; padding:0; overflow:hidden;">
+    <div class="cmd-search-row">
+      <span class="cmd-search-icon" aria-hidden="true">🔍</span>
+      <input type="search" class="cmd-input" id="cmd-input" placeholder="Search actions, clauses, memory entries..." aria-label="Command palette search" oninput="filterCommands(this.value)" autocomplete="off" />
+      <kbd class="cmd-esc-key" onclick="closeModal('cmd-palette')">esc</kbd>
+    </div>
+    <div class="cmd-results" id="cmd-results" role="listbox" aria-label="Command results">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="cmd-footer">
+      <span><kbd>↑↓</kbd> Navigate</span>
+      <span><kbd>Enter</kbd> Select</span>
+      <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SETTINGS DRAWER
+══════════════════════════════════════════ -->
+<div class="settings-drawer-overlay" id="settings-overlay" onclick="closeSettings(event)" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+  <div class="settings-drawer" id="settings-drawer">
+    <div class="settings-header">
+      <h2 class="settings-title" id="settings-title">⚙️ Settings &amp; Preferences</h2>
+      <button class="modal-close" style="position:static;" onclick="closeSettings()" aria-label="Close settings">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <div class="settings-section">
+        <div class="settings-section-title">Display</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Font Size</div>
+            <div class="settings-row-sub">Adjust base interface text size</div>
+          </div>
+          <div class="settings-font-btns" role="group" aria-label="Font size">
+            <button class="settings-font-btn" id="font-sm" onclick="setFontSize('sm')" aria-label="Small font">A<small>-</small></button>
+            <button class="settings-font-btn active" id="font-md" onclick="setFontSize('md')" aria-label="Normal font">A</button>
+            <button class="settings-font-btn" id="font-lg" onclick="setFontSize('lg')" aria-label="Large font">A<sup>+</sup></button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Reduce Motion</div>
+            <div class="settings-row-sub">Minimize animations &amp; transitions</div>
+          </div>
+          <label class="toggle-track" style="width:48px; height:24px;" aria-label="Reduce motion">
+            <input type="checkbox" id="setting-reduce-motion" onchange="applyReduceMotion(this.checked)" />
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Compact View</div>
+            <div class="settings-row-sub">Tighter layout with less padding</div>
+          </div>
+          <label class="toggle-track" style="width:48px; height:24px;" aria-label="Compact view">
+            <input type="checkbox" id="setting-compact" onchange="applyCompactView(this.checked)" />
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">AI Behaviour</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Auto-Enable Memory</div>
+            <div class="settings-row-sub">Start dashboard with Hindsight Memory on</div>
+          </div>
+          <label class="toggle-track" style="width:48px; height:24px;" aria-label="Auto-enable memory">
+            <input type="checkbox" id="setting-auto-memory" />
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Default Tone</div>
+            <div class="settings-row-sub">Pre-select counter-offer tone</div>
+          </div>
+          <select class="counter-tone-select" id="setting-default-tone" style="min-height:36px; font-size:0.78rem;" aria-label="Default counter-offer tone">
+            <option value="assertive">⚡ Assertive</option>
+            <option value="collaborative">🤝 Collaborative</option>
+            <option value="firm">🔒 Firm &amp; Final</option>
+            <option value="exploratory">💬 Exploratory</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Notifications</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Toast Notifications</div>
+            <div class="settings-row-sub">Show action feedback messages</div>
+          </div>
+          <label class="toggle-track" style="width:48px; height:24px;" aria-label="Toast notifications">
+            <input type="checkbox" id="setting-toasts" checked />
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Auto-Save Session</div>
+            <div class="settings-row-sub">Restore memory mode &amp; settings on return</div>
+          </div>
+          <label class="toggle-track" style="width:48px; height:24px;" aria-label="Auto-save session">
+            <input type="checkbox" id="setting-autosave" checked />
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Data &amp; Privacy</div>
+        <div class="settings-row" style="gap:0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="clearAllData()" id="clear-data-btn" style="flex:1;" aria-label="Clear all locally stored data">
+            🗑️ Clear Local Data
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="exportSettings()" style="flex:1;" aria-label="Export your settings as JSON">
+            ⬇ Export Settings
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="settings-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeSettings()" aria-label="Close settings">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()" id="save-settings-btn" aria-label="Save settings">✓ Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HELP / KEYBOARD SHORTCUTS MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" onclick="closeModal('help-modal',event)">
+  <div class="modal-box" style="max-width:600px;">
+    <button class="modal-close" onclick="closeModal('help-modal')" aria-label="Close help">✕</button>
+    <h2 style="font-size:1.1rem; margin-bottom:1.25rem;" id="help-modal-title">⌨️ Keyboard Shortcuts &amp; Quick Reference</h2>
+    <div class="shortcut-grid">
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Navigation</div>
+        <div class="shortcut-row"><span>Go to Dashboard</span><kbd>Alt + D</kbd></div>
+        <div class="shortcut-row"><span>Go to Home</span><kbd>Alt + H</kbd></div>
+        <div class="shortcut-row"><span>Command Palette</span><kbd>Ctrl + K</kbd></div>
+        <div class="shortcut-row"><span>Close modal / overlay</span><kbd>Esc</kbd></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Contract Viewer</div>
+        <div class="shortcut-row"><span>Search clauses</span><kbd>Ctrl + F</kbd></div>
+        <div class="shortcut-row"><span>Full Contract tab</span><kbd>Ctrl + 1</kbd></div>
+        <div class="shortcut-row"><span>Risk Clauses tab</span><kbd>Ctrl + 2</kbd></div>
+        <div class="shortcut-row"><span>Memory Hits tab</span><kbd>Ctrl + 3</kbd></div>
+        <div class="shortcut-row"><span>Vendor Matrix tab</span><kbd>Ctrl + 4</kbd></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">AI Actions</div>
+        <div class="shortcut-row"><span>Generate Counter-Offer</span><kbd>Ctrl + G</kbd></div>
+        <div class="shortcut-row"><span>Toggle Memory Mode</span><kbd>Ctrl + M</kbd></div>
+        <div class="shortcut-row"><span>Refresh Analysis</span><kbd>Ctrl + R</kbd></div>
+        <div class="shortcut-row"><span>Copy Counter-Offer</span><kbd>Ctrl + C</kbd></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Tools</div>
+        <div class="shortcut-row"><span>Open Settings</span><kbd>Ctrl + ,</kbd></div>
+        <div class="shortcut-row"><span>Show/Hide Redline</span><kbd>Ctrl + E</kbd></div>
+        <div class="shortcut-row"><span>ROI Calculator</span><kbd>Ctrl + I</kbd></div>
+        <div class="shortcut-row"><span>Help / Shortcuts</span><kbd>?</kbd></div>
+      </div>
+    </div>
+    <div class="insight-callout" style="margin-top:1.5rem; font-size:0.78rem;">
+      <span class="insight-callout-icon" aria-hidden="true">💡</span>
+      <span>Tip: Press <kbd style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:1px 5px;">Ctrl+K</kbd> from anywhere to open the Command Palette and quickly jump to any feature.</span>
+    </div>
+  </div>
+</div>
 <div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Cookie consent" aria-describedby="cookie-desc">
   <p class="cookie-text" id="cookie-desc">
     <strong>🍪 Cookie Notice</strong> — We use essential cookies for core functionality and optional analytics cookies to improve your experience. Your data is processed per our <a href="./privacy.html" aria-label="Read our Privacy Policy">Privacy Policy</a>. You can change preferences at any time.
