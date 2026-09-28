@@ -1067,3 +1067,424 @@ document.addEventListener('DOMContentLoaded', () => {
   // Animate risk bar on dashboard load (deferred)
   // Dashboard init is triggered by showView('dashboard')
 });
+
+// ══════════════════════════════════════════════════════
+// FEATURE 1: ROI Calculator Modal
+// ══════════════════════════════════════════════════════
+
+function openROIModal() {
+  const modal = document.getElementById('roi-modal');
+  if (modal) modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('roi-annual-spend')?.focus(), 100);
+}
+
+function calcROI() {
+  const spend    = parseFloat(document.getElementById('roi-annual-spend')?.value) || 0;
+  const vendors  = parseInt(document.getElementById('roi-vendor-count')?.value) || 0;
+  const renewPct = parseFloat(document.getElementById('roi-renewal-pct')?.value) || 0;
+  const currDisc = parseFloat(document.getElementById('roi-current-discount')?.value) || 0;
+
+  if (!spend || !vendors || !renewPct) return;
+
+  const resultCard = document.getElementById('roi-result-card');
+  if (!resultCard) return;
+
+  // DealMind uplift: 14.2% average vs baseline
+  const dealmindDiscount = Math.min(currDisc + 9.2, 35);
+  const renewableSpend = spend * (renewPct / 100);
+  const baselineSavings = renewableSpend * (currDisc / 100);
+  const optimizedSavings = renewableSpend * (dealmindDiscount / 100);
+  const uplift = optimizedSavings - baselineSavings;
+  const paybackMonths = uplift > 0 ? Math.ceil(12000 / uplift * 12) : null;
+
+  const fmt = (n) => n >= 1000000
+    ? `$${(n / 1000000).toFixed(1)}M`
+    : n >= 1000
+    ? `$${Math.round(n / 1000)}K`
+    : `$${Math.round(n)}`;
+
+  const savingsEl = document.getElementById('roi-res-savings');
+  const discountEl = document.getElementById('roi-res-discount');
+  const paybackEl = document.getElementById('roi-res-payback');
+  const insightEl = document.getElementById('roi-res-insight');
+
+  if (savingsEl) savingsEl.textContent = fmt(uplift);
+  if (discountEl) discountEl.textContent = `${dealmindDiscount.toFixed(1)}%`;
+  if (paybackEl) paybackEl.textContent = paybackMonths && paybackMonths < 24 ? `${paybackMonths}mo` : '< 2yr';
+  if (insightEl) insightEl.textContent = `With Hindsight Memory, your ${renewPct}% renewal pipeline (~${fmt(renewableSpend)} at risk) could yield ${fmt(uplift)} in additional savings vs. your current ${currDisc}% average discount.`;
+
+  resultCard.classList.add('visible');
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 2: Memory Timeline View
+// ══════════════════════════════════════════════════════
+
+const TIMELINE_EVENTS = [
+  { date: 'Mar 2023', type: 'SLA Breach',       title: 'Datadog APM — 4.2hr P1 Outage',              snippet: 'Incident DD-89234. Internal impact: $127K.\nCredit issued: $18,400. Acknowledged by VP Customer Success.', leverage: '18% price reduction leverage via precedent' },
+  { date: 'Nov 2023', type: 'SLA Breach',       title: 'Log Pipeline Degradation — 6+ Hours',         snippet: 'P1 ticket response exceeded SLA by 2.7 hours.\nEngineering escalation required. Pattern: 2nd documented breach.', leverage: 'Strong enterprise support negotiation angle' },
+  { date: 'Jan 2024', type: 'Price Concession', title: 'FY2024 Renewal — $412K → $367K Negotiated',   snippet: 'Initial ask: $412K (+18.3% YoY).\nFinal: $367K flat. Cited SLA breaches + Grafana competitive pricing.', leverage: 'Q4 negotiations yield 8–15% better outcomes' },
+  { date: 'Jun 2024', type: 'Clause Win',       title: 'Overage Auto-Charge Clause Removed',           snippet: '30-day grace period added. Email alert at 80% usage.\nNegotiated via AWS Marketplace alternative pricing reference.', leverage: 'Overage clause is negotiable; use AWS as leverage' },
+  { date: 'Aug 2024', type: 'Competitive Intel','title': 'Grafana $290K · New Relic $315K Benchmarked', snippet: 'Grafana Cloud Enterprise: $290K/yr.\nNew Relic All-In: $315K/yr. Migration cost est: $85K/6mo.', leverage: 'Alternatives soften migration cost — use as negotiation floor' },
+  { date: 'Jan 2025', type: 'Pattern Found',    title: 'Dec / Q1-End = Best Negotiation Windows',       snippet: 'AE Marcus Chen confirmed Q4/Q1 end pressure.\nSimilar org achieved 22% discount by threatening 40% workload migration.', leverage: 'Best window: Dec 1–15 or final week of Q1' },
+  { date: '2026 NOW', type: 'Leverage Applied', title: 'Counter-Offer: $342K vs $485K Proposed',        snippet: 'All 5 memory cycles applied.\nCounter proposed at $342K (-29.5%) leveraging breach history.', leverage: 'Estimated +55% leverage vs. generic baseline' },
+];
+
+function switchMemoryView(view) {
+  const listView = document.getElementById('memory-body');
+  const timelineView = document.getElementById('memory-timeline-view');
+  const listBtn = document.getElementById('mem-view-list');
+  const timelineBtn = document.getElementById('mem-view-timeline');
+
+  if (view === 'list') {
+    listView?.classList.add('active');
+    timelineView?.classList.remove('active');
+    listBtn?.classList.add('active');
+    timelineBtn?.classList.remove('active');
+    listBtn?.setAttribute('aria-pressed', 'true');
+    timelineBtn?.setAttribute('aria-pressed', 'false');
+  } else {
+    listView?.classList.remove('active');
+    timelineView?.classList.add('active');
+    listBtn?.classList.remove('active');
+    timelineBtn?.classList.add('active');
+    listBtn?.setAttribute('aria-pressed', 'false');
+    timelineBtn?.setAttribute('aria-pressed', 'true');
+    renderTimeline();
+  }
+}
+
+function renderTimeline() {
+  const track = document.getElementById('timeline-track');
+  if (!track) return;
+
+  if (!state.memoryMode) {
+    track.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:0.82rem;">
+      <div style="font-size:1.5rem; opacity:0.4; margin-bottom:0.5rem;">🧠</div>
+      Enable Hindsight Memory to view the negotiation timeline.
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  TIMELINE_EVENTS.forEach((evt, i) => {
+    html += `<div class="timeline-node" id="tnode-${i}" onclick="toggleTimelineNode(${i})" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleTimelineNode(${i})">
+      <div class="timeline-node-dot" aria-hidden="true"></div>
+      <div class="timeline-node-card">
+        <div class="timeline-node-header">
+          <div>
+            <div class="timeline-node-date">${evt.date}</div>
+            <div class="timeline-node-type">${evt.type}</div>
+          </div>
+          <span class="timeline-node-arrow" aria-hidden="true">▾</span>
+        </div>
+        <div class="timeline-node-title">${evt.title}</div>
+        <div class="timeline-node-drawer" id="tdrawer-${i}">
+          ${evt.snippet}
+          <div class="timeline-drawer-snippet">${evt.snippet}</div>
+          <div class="timeline-drawer-leverage"><span aria-hidden="true">⚡</span> ${evt.leverage}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  track.innerHTML = html;
+}
+
+function toggleTimelineNode(i) {
+  const node = document.getElementById(`tnode-${i}`);
+  if (!node) return;
+  const isExpanded = node.classList.contains('expanded');
+  // Collapse all
+  document.querySelectorAll('.timeline-node').forEach(n => {
+    n.classList.remove('expanded');
+    n.setAttribute('aria-expanded', 'false');
+  });
+  // Expand this one if it wasn't already open
+  if (!isExpanded) {
+    node.classList.add('expanded');
+    node.setAttribute('aria-expanded', 'true');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 3: Vendor Comparison Matrix Tab
+// ══════════════════════════════════════════════════════
+
+const VENDOR_MATRIX = [
+  {
+    vendor: 'Datadog',
+    metric: 'Annual Subscription Fee',
+    y2024: '$367,000',   y2025: '$412,000',   y2026: '<span class="trend-up">▲ $485,000 (+32%)</span>',
+    trend: 'up',
+    sla: { y2024: '<span class="matrix-breach-badge">⚠ 2 Breaches</span>', y2025: '<span class="matrix-ok-badge">✓ Met</span>', y2026: '<span class="matrix-ok-badge">✓ Pending</span>' }
+  },
+  {
+    vendor: 'AWS',
+    metric: 'Reserved Instance Spend',
+    y2024: '$210,000',   y2025: '$228,000',   y2026: '<span class="trend-up">▲ $261,000 (+14%)</span>',
+    trend: 'up',
+    sla: { y2024: '<span class="matrix-ok-badge">✓ 99.99%</span>', y2025: '<span class="matrix-ok-badge">✓ 99.99%</span>', y2026: '<span class="matrix-ok-badge">✓ Projected</span>' }
+  },
+  {
+    vendor: 'Salesforce',
+    metric: 'CRM Platform License',
+    y2024: '$185,000',   y2025: '$196,000',   y2026: '<span class="trend-up">▲ $218,000 (+11%)</span>',
+    trend: 'up',
+    sla: { y2024: '<span class="matrix-ok-badge">✓ Met</span>', y2025: '<span class="matrix-breach-badge">⚠ 1 Breach</span>', y2026: '<span class="matrix-ok-badge">✓ Pending</span>' }
+  }
+];
+
+function renderVendorMatrix() {
+  const container = document.getElementById('contract-matrix');
+  if (!container) return;
+
+  let rows = '';
+  VENDOR_MATRIX.forEach(v => {
+    rows += `<tr>
+      <td>${v.vendor}</td>
+      <td>${v.metric}</td>
+      <td class="year-col">${v.y2024}</td>
+      <td class="year-col">${v.y2025}</td>
+      <td class="year-col">${v.y2026}</td>
+      <td class="year-col">${v.sla.y2024}</td>
+      <td class="year-col">${v.sla.y2025}</td>
+      <td class="year-col">${v.sla.y2026}</td>
+    </tr>`;
+  });
+
+  container.innerHTML = `
+    <div class="insight-callout" style="margin-bottom:1rem;">
+      <span class="insight-callout-icon" aria-hidden="true">📊</span>
+      <span><strong>Vendor Renewal History</strong> — Side-by-side comparison of 2024–2026 renewal terms. <span style="color:var(--risk-high);">▲ Red</span> = price creep detected. SLA breach patterns highlighted.</span>
+    </div>
+    <div class="vendor-matrix-wrap" role="region" aria-label="Vendor renewal comparison matrix">
+      <table class="vendor-matrix-table" aria-label="Vendor renewal comparison 2024-2026">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Metric</th>
+            <th class="year-col">FY 2024</th>
+            <th class="year-col">FY 2025</th>
+            <th class="year-col">FY 2026 (Draft)</th>
+            <th class="year-col">SLA 2024</th>
+            <th class="year-col">SLA 2025</th>
+            <th class="year-col">SLA 2026</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="insight-callout" style="margin-top:1rem; background:rgba(239,68,68,0.06); border-color:rgba(239,68,68,0.3);">
+      <span class="insight-callout-icon" aria-hidden="true">🔴</span>
+      <span><strong>Price Creep Alert:</strong> All 3 vendors show consistent YoY escalation. Datadog's +32% is the highest. Apply Hindsight Memory to all renewals for maximum leverage.</span>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 4: Slack & Email Integration Simulator
+// ══════════════════════════════════════════════════════
+
+function openSlackModal() {
+  const modal = document.getElementById('slack-modal');
+  if (modal) modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function simulateSlackSend() {
+  const btn = document.getElementById('slack-send-btn');
+  if (btn) {
+    btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;" aria-hidden="true"></span> Sending...';
+    btn.disabled = true;
+  }
+  setTimeout(() => {
+    closeModal('slack-modal');
+    showToast('✅ Slack alert sent to #procurement — 3 team members notified', 'success');
+    if (btn) { btn.innerHTML = '<span aria-hidden="true">💬</span> Send to #procurement'; btn.disabled = false; }
+  }, 1600);
+}
+
+function openEmailClientModal() {
+  const modal = document.getElementById('email-modal');
+  if (!modal) return;
+
+  // Pre-populate body preview from counter offer
+  const output = document.getElementById('counter-output');
+  const bodyPreview = document.getElementById('email-body-preview');
+  const subjectPreview = document.getElementById('email-subject-preview');
+
+  if (bodyPreview && output) {
+    const text = output.innerText || '';
+    bodyPreview.textContent = text.substring(0, 400) + (text.length > 400 ? '...' : '');
+  }
+  if (subjectPreview) {
+    subjectPreview.textContent = state.memoryMode
+      ? 'Datadog SaaS Renewal 2026 — Formal Counter-Proposal [REF: DD-CONTRACT-2026-003]'
+      : 'Re: Datadog SaaS Renewal 2026 — Counter-Proposal';
+  }
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function launchMailto() {
+  const output = document.getElementById('counter-output');
+  const subject = state.memoryMode
+    ? 'Datadog SaaS Renewal 2026 — Formal Counter-Proposal [REF: DD-CONTRACT-2026-003]'
+    : 'Re: Datadog SaaS Renewal 2026 — Counter-Proposal';
+  const body = output ? output.innerText : 'Please find our counter-proposal attached.';
+  const mailto = `mailto:marcus.chen@datadog.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+  showToast('📧 Opening your email client...', 'info');
+  closeModal('email-modal');
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 5: Contract Redline Exporter
+// ══════════════════════════════════════════════════════
+
+const REDLINE_DATA = [
+  {
+    section: 'Section 1.1 — Subscription Fees',
+    changes: true,
+    lines: [
+      { type: 'removed', text: 'Annual Subscription Fee of $485,000 USD representing a 32% increase.' },
+      { type: 'added',   text: 'Annual Subscription Fee of $342,000 USD (DealMind counter-term: 5% max annual escalation cap).' },
+    ]
+  },
+  {
+    section: 'Section 2.3 — SLA Remedies',
+    changes: true,
+    lines: [
+      { type: 'removed', text: 'Service credits capped at 20% of monthly fees (sole and exclusive remedy).' },
+      { type: 'added',   text: 'Service credits uncapped for P1 breaches; Enterprise Support (24/7, 1-hr P1) included at no cost.' },
+    ]
+  },
+  {
+    section: 'Section 3.7 — Auto-Renewal',
+    changes: true,
+    lines: [
+      { type: 'removed', text: '60 days written notice required for non-renewal.' },
+      { type: 'added',   text: '30 days written notice required for non-renewal.' },
+    ]
+  },
+  {
+    section: 'Section 4.2 — Data Retention',
+    changes: true,
+    lines: [
+      { type: 'unchanged', text: 'Datadog processes Licensee data per the DPA.' },
+      { type: 'removed',   text: 'Telemetry data retained up to 15 months for AI model training.' },
+      { type: 'added',     text: 'Explicit opt-out from AI training data usage (GDPR Article 22 compliance; FY2024 DPA precedent).' },
+    ]
+  },
+  {
+    section: 'Section 5.1 — Limitation of Liability',
+    changes: true,
+    lines: [
+      { type: 'removed', text: 'Datadog liability capped at fees paid in the 3 months preceding the claim.' },
+      { type: 'added',   text: 'Datadog liability capped at minimum 12-month subscription value.' },
+    ]
+  },
+  {
+    section: 'Section 6.4 — Support Tiers',
+    changes: false,
+    lines: [
+      { type: 'unchanged', text: 'Standard Support as baseline. Enterprise add-on available.' },
+    ]
+  },
+];
+
+function toggleRedlinePreview() {
+  const wrap = document.getElementById('redline-preview');
+  const btn = document.getElementById('redline-toggle-btn');
+  if (!wrap) return;
+
+  const isVisible = wrap.classList.contains('visible');
+  if (isVisible) {
+    wrap.classList.remove('visible');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  } else {
+    renderRedlinePreview();
+    wrap.classList.add('visible');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    showToast('📝 Redline preview generated — 4 removed, 6 added', 'info');
+  }
+}
+
+function renderRedlinePreview() {
+  const body = document.getElementById('redline-preview-body');
+  if (!body) return;
+
+  let html = '';
+  REDLINE_DATA.forEach(block => {
+    const linesHtml = block.lines.map(line => {
+      if (line.type === 'removed')
+        return `<div><span class="redline-removed">${line.text}</span></div>`;
+      if (line.type === 'added')
+        return `<div><span class="redline-added">+ ${line.text}</span></div>`;
+      return `<div><span class="redline-unchanged">${line.text}</span></div>`;
+    }).join('');
+
+    html += `<div class="redline-clause-block ${block.changes ? 'has-changes' : ''}">
+      <div class="redline-clause-num">${block.section}</div>
+      ${linesHtml}
+    </div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function downloadRedlinePDF() {
+  showToast('📄 Generating redlined PDF summary briefing...', 'info');
+  setTimeout(() => {
+    window.print();
+    showToast('✅ PDF export triggered — check your print dialog', 'success');
+  }, 800);
+}
+
+// ══════════════════════════════════════════════════════
+// MODAL UTILITY
+// ══════════════════════════════════════════════════════
+
+function closeModal(id, event) {
+  if (event && event.target !== event.currentTarget) return; // Only close on backdrop click
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close modals on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    ['roi-modal', 'slack-modal', 'email-modal'].forEach(id => {
+      const m = document.getElementById(id);
+      if (m && m.classList.contains('open')) {
+        m.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// PATCH: extend switchContractTab for matrix tab
+// and extend renderContractContent for matrix
+// ══════════════════════════════════════════════════════
+
+const _origSwitchContractTab = switchContractTab;
+switchContractTab = function(tab) {
+  _origSwitchContractTab(tab);
+  // Show/hide matrix tab panel
+  const matrixPanel = document.getElementById('contract-matrix');
+  if (matrixPanel) matrixPanel.style.display = tab === 'matrix' ? '' : 'none';
+  // Render matrix lazily
+  if (tab === 'matrix') renderVendorMatrix();
+};
+
+const _origRenderContractContent = renderContractContent;
+renderContractContent = function() {
+  _origRenderContractContent();
+  // matrix is rendered lazily on tab click
+};
+

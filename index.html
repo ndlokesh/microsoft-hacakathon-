@@ -357,6 +357,9 @@
           <span aria-hidden="true">🧠</span> Memory Hits
           <span class="badge badge-memory" style="padding: 1px 6px; font-size: 0.65rem;" aria-label="3 memory hits">3</span>
         </button>
+        <button class="contract-tab" id="ctab-matrix" onclick="switchContractTab('matrix')" role="tab" aria-selected="false" aria-controls="contract-matrix">
+          <span aria-hidden="true">📊</span> Vendor Matrix
+        </button>
       </div>
 
       <!-- Contract Body -->
@@ -366,6 +369,7 @@
         </div>
         <div id="contract-risks" class="contract-content" style="display:none;" role="tabpanel" aria-labelledby="ctab-risks"></div>
         <div id="contract-memory" class="contract-content" style="display:none;" role="tabpanel" aria-labelledby="ctab-memory"></div>
+        <div id="contract-matrix" class="contract-content" style="display:none;" role="tabpanel" aria-labelledby="ctab-matrix"></div>
       </div>
 
       <!-- Status Bar -->
@@ -375,6 +379,34 @@
         <span style="margin-left:auto; display:flex; align-items:center; gap:0.4rem;">
           <span class="vendor-chip">Vendor: Datadog Inc.</span>
         </span>
+      </div>
+
+      <!-- Redline Export Bar -->
+      <div style="padding: 0.5rem 1.25rem 0.75rem; border-top: 1px solid var(--border); background: var(--bg-base); flex-shrink:0;">
+        <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="toggleRedlinePreview()" id="redline-toggle-btn" aria-expanded="false" aria-controls="redline-preview">
+          <span aria-hidden="true">📝</span> Export Redlined Contract
+        </button>
+        <div class="redline-preview-wrap" id="redline-preview" role="region" aria-label="Redlined contract preview">
+          <div class="redline-preview-header">
+            <span>📝 Track Changes — Redline Preview</span>
+            <span style="font-size:0.68rem; font-weight:400; color: var(--text-muted); text-transform:none; letter-spacing:0;">Vendor draft vs. DealMind counter-terms</span>
+          </div>
+          <div class="redline-preview-body" id="redline-preview-body">
+            <!-- Rendered by JS -->
+          </div>
+          <div class="redline-export-bar">
+            <div class="redline-stats">
+              <span class="redline-stat-item"><span class="redline-dot-red"></span>4 Removals</span>
+              <span class="redline-stat-item"><span class="redline-dot-green"></span>6 Additions</span>
+            </div>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-sm" onclick="downloadRedlinePDF()" id="redline-download-btn" aria-label="Download redlined contract as PDF">
+                <span aria-hidden="true">⬇</span> Download PDF
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleRedlinePreview()" aria-label="Close redline preview">✕ Close</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -395,6 +427,29 @@
       </div>
 
       <div class="right-pane-inner" role="main">
+
+        <!-- ── 0. Procurement ROI Impact Bar ── -->
+        <div class="roi-bar" id="roi-impact-bar" role="region" aria-label="Procurement Impact Summary">
+          <div class="roi-bar-stat">
+            <span class="roi-bar-value" id="roi-dollars-saved">$42,500</span>
+            <span class="roi-bar-label">Total Saved Across 3 SaaS Renewals</span>
+          </div>
+          <div class="roi-bar-divider" aria-hidden="true"></div>
+          <div class="roi-bar-stat">
+            <span class="roi-bar-value" id="roi-avg-discount">14.2%</span>
+            <span class="roi-bar-label">Avg. Discount via Hindsight Memory</span>
+          </div>
+          <div class="roi-bar-divider" aria-hidden="true"></div>
+          <div class="roi-bar-stat">
+            <span class="roi-bar-value">3</span>
+            <span class="roi-bar-label">Contracts Optimized</span>
+          </div>
+          <div class="roi-bar-cta">
+            <button class="btn btn-secondary btn-sm" onclick="openROIModal()" id="roi-calc-btn" aria-label="Open ROI Calculator">
+              <span aria-hidden="true">📊</span> ROI Calculator
+            </button>
+          </div>
+        </div>
 
         <!-- ── 1. Risk Score Card ── -->
         <div class="risk-card" id="risk-card" aria-labelledby="risk-card-title">
@@ -500,14 +555,27 @@
             </div>
             <div style="display:flex; align-items:center; gap:0.5rem;">
               <span class="memory-count" id="memory-count-badge" aria-label="7 memory entries found">7 Entries</span>
+              <!-- View toggle: List vs Timeline -->
+              <div class="memory-view-toggle" role="group" aria-label="Memory view mode">
+                <button class="mem-view-btn active" id="mem-view-list" onclick="switchMemoryView('list')" aria-pressed="true">List</button>
+                <button class="mem-view-btn" id="mem-view-timeline" onclick="switchMemoryView('timeline')" aria-pressed="false">Timeline</button>
+              </div>
               <button class="btn btn-ghost btn-sm btn-icon" onclick="toggleMemoryExpanded()" id="memory-expand-btn" aria-label="Expand or collapse memory panel" data-tooltip="Expand all">
                 ⤢
               </button>
             </div>
           </div>
 
-          <div class="memory-body" id="memory-body" aria-label="Historical negotiation memory entries">
+          <!-- List view -->
+          <div class="memory-entries-view active" id="memory-body" aria-label="Historical negotiation memory entries">
             <!-- Memory entries loaded by JS -->
+          </div>
+
+          <!-- Timeline view -->
+          <div class="memory-timeline-view" id="memory-timeline-view" aria-label="Memory event timeline">
+            <div class="timeline-track" id="timeline-track">
+              <!-- Timeline nodes rendered by JS -->
+            </div>
           </div>
         </div>
 
@@ -555,6 +623,12 @@
               <button class="btn btn-secondary btn-sm" onclick="exportCounterOffer('pdf')" id="export-pdf-btn" aria-label="Export counter-offer as PDF">
                 <span aria-hidden="true">📄</span> Export PDF
               </button>
+              <button class="btn btn-secondary btn-sm" onclick="openSlackModal()" id="slack-alert-btn" aria-label="Send Slack alert to procurement channel">
+                <span aria-hidden="true">💬</span> Slack Alert
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="openEmailClientModal()" id="email-client-btn" aria-label="Open in email client">
+                <span aria-hidden="true">✉️</span> Email Client
+              </button>
               <button class="btn btn-ghost btn-sm" onclick="regenerateCounterOffer()" id="regen-btn" aria-label="Regenerate counter-offer with different phrasing">
                 <span aria-hidden="true">↻</span> Regenerate
               </button>
@@ -583,6 +657,138 @@
     <button class="btn btn-primary btn-sm" onclick="acceptCookies('all')" id="cookie-accept-btn" aria-label="Accept all cookies">
       ✓ Accept All
     </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: ROI Calculator
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="roi-modal" role="dialog" aria-modal="true" aria-labelledby="roi-modal-title" onclick="closeModal('roi-modal', event)">
+  <div class="modal-box" style="max-width:560px;">
+    <button class="modal-close" onclick="closeModal('roi-modal')" aria-label="Close ROI calculator">✕</button>
+    <h2 style="font-size:1.1rem; margin-bottom:0.35rem;" id="roi-modal-title">📊 ROI Calculator</h2>
+    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0;">Estimate your annual savings using DealMind AI's Hindsight Memory leverage.</p>
+    <div class="roi-modal-grid">
+      <div class="roi-modal-field">
+        <label for="roi-annual-spend">Annual SaaS Spend ($)</label>
+        <input type="number" id="roi-annual-spend" placeholder="e.g. 1200000" min="0" oninput="calcROI()" aria-label="Your annual SaaS spend in dollars" />
+      </div>
+      <div class="roi-modal-field">
+        <label for="roi-vendor-count">Number of Vendors</label>
+        <input type="number" id="roi-vendor-count" placeholder="e.g. 12" min="1" oninput="calcROI()" aria-label="Number of SaaS vendors" />
+      </div>
+      <div class="roi-modal-field">
+        <label for="roi-renewal-pct">% Renewals / Year</label>
+        <input type="number" id="roi-renewal-pct" placeholder="e.g. 40" min="0" max="100" oninput="calcROI()" aria-label="Percentage of contracts up for renewal per year" />
+      </div>
+      <div class="roi-modal-field">
+        <label for="roi-current-discount">Current Avg. Discount (%)</label>
+        <input type="number" id="roi-current-discount" placeholder="e.g. 5" min="0" max="50" oninput="calcROI()" aria-label="Your current average discount percentage" />
+      </div>
+    </div>
+    <div class="roi-result-card" id="roi-result-card" role="region" aria-label="Projected ROI results" aria-live="polite">
+      <div style="font-size:0.78rem; font-weight:700; color:var(--accent-emerald); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.25rem;">📈 Projected Annual Impact</div>
+      <div class="roi-result-grid">
+        <div class="roi-result-item">
+          <span class="val" id="roi-res-savings">$0</span>
+          <span class="lbl">Projected Savings</span>
+        </div>
+        <div class="roi-result-item">
+          <span class="val" id="roi-res-discount">0%</span>
+          <span class="lbl">Avg. New Discount</span>
+        </div>
+        <div class="roi-result-item">
+          <span class="val" id="roi-res-payback">—</span>
+          <span class="lbl">ROI Payback Period</span>
+        </div>
+      </div>
+      <div class="insight-callout" style="margin-top:1rem; font-size:0.78rem;">
+        <span class="insight-callout-icon" aria-hidden="true">💡</span>
+        <span id="roi-res-insight">Based on Hindsight Memory benchmarks: 14.2% average discount uplift vs. 5% baseline.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: Slack Alert Simulator
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="slack-modal" role="dialog" aria-modal="true" aria-labelledby="slack-modal-title" onclick="closeModal('slack-modal', event)">
+  <div class="modal-box" style="max-width:560px;">
+    <button class="modal-close" onclick="closeModal('slack-modal')" aria-label="Close Slack modal">✕</button>
+    <h2 style="font-size:1.1rem; margin-bottom:0.25rem;" id="slack-modal-title">💬 Slack Alert Preview</h2>
+    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0;">Simulated message to <strong style="color:var(--accent-emerald);">#procurement</strong></p>
+    <div class="slack-modal-preview" role="region" aria-label="Slack message preview">
+      <div class="slack-workspace-bar">
+        <div class="slack-workspace-dot" aria-hidden="true"></div>
+        <span class="slack-workspace-name">YourCompany Workspace</span>
+        <span class="slack-channel-name"># procurement</span>
+      </div>
+      <div class="slack-message">
+        <div class="slack-avatar" aria-hidden="true">🤖</div>
+        <div class="slack-message-body">
+          <div class="slack-sender-row">
+            <span class="slack-sender-name">DealMind AI</span>
+            <span class="slack-app-tag">App</span>
+            <span class="slack-timestamp">Today at 10:42 AM</span>
+          </div>
+          <div class="slack-msg-text">🚨 <strong>Contract Alert:</strong> Datadog SaaS Renewal requires immediate action — renewal deadline in <strong>109 days</strong>.</div>
+          <div class="slack-msg-attachment">
+            <div class="slack-attachment-title">⚡ DealMind AI — Contract Intelligence Report</div>
+            <div class="slack-attachment-field"><strong>Vendor:</strong> Datadog Inc.</div>
+            <div class="slack-attachment-field"><strong>Risk Score:</strong> 74/100 — HIGH RISK</div>
+            <div class="slack-attachment-field"><strong>Proposed Increase:</strong> +32% YoY ($485K vs $367K)</div>
+            <div class="slack-attachment-field"><strong>Memory Leverage:</strong> 2 SLA breaches + 3 concessions on file</div>
+            <div class="slack-attachment-field"><strong>Recommended Counter:</strong> $342,000 (−29.5%)</div>
+            <div class="slack-attachment-field"><strong>Best Window:</strong> Dec 1–15 (Q4 pressure confirmed)</div>
+          </div>
+          <div class="slack-reactions">
+            <span class="slack-reaction" onclick="this.style.background='rgba(255,255,255,0.18)'">👀 <span>3</span></span>
+            <span class="slack-reaction" onclick="this.style.background='rgba(255,255,255,0.18)'">⚡ <span>1</span></span>
+            <span class="slack-reaction" onclick="this.style.background='rgba(255,255,255,0.18)'">✅ <span>2</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; gap:0.6rem; margin-top:1rem; justify-content:flex-end; flex-wrap:wrap;">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('slack-modal')" aria-label="Dismiss Slack preview">Dismiss</button>
+      <button class="btn btn-primary btn-sm" onclick="simulateSlackSend()" id="slack-send-btn" aria-label="Simulate sending Slack alert">
+        <span aria-hidden="true">💬</span> Send to #procurement
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: Email Client Pre-fill
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="email-modal" role="dialog" aria-modal="true" aria-labelledby="email-modal-title" onclick="closeModal('email-modal', event)">
+  <div class="modal-box" style="max-width:520px;">
+    <button class="modal-close" onclick="closeModal('email-modal')" aria-label="Close email modal">✕</button>
+    <h2 style="font-size:1.1rem; margin-bottom:0.25rem;" id="email-modal-title">✉️ Open in Email Client</h2>
+    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:1.25rem;">Pre-populated with vendor contact, subject line, and counter-proposal body.</p>
+    <div style="display:flex; flex-direction:column; gap:0.75rem; background:var(--bg-base); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem;">
+      <div>
+        <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.3rem;">To</div>
+        <div style="font-size:0.85rem; color:var(--text-primary);">marcus.chen@datadog.com</div>
+      </div>
+      <div style="height:1px; background:var(--border);"></div>
+      <div>
+        <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.3rem;">Subject</div>
+        <div style="font-size:0.85rem; color:var(--text-primary);" id="email-subject-preview">Datadog SaaS Renewal 2026 — Formal Counter-Proposal [REF: DD-CONTRACT-2026-003]</div>
+      </div>
+      <div style="height:1px; background:var(--border);"></div>
+      <div>
+        <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.3rem;">Body Preview</div>
+        <div style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono); line-height:1.6; max-height:120px; overflow:auto;" id="email-body-preview">Generated counter-offer will appear here...</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:0.6rem; margin-top:1rem; justify-content:flex-end; flex-wrap:wrap;">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('email-modal')" aria-label="Cancel">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="launchMailto()" id="launch-mailto-btn" aria-label="Open in email client">
+        <span aria-hidden="true">✉️</span> Open in Email Client
+      </button>
+    </div>
   </div>
 </div>
 

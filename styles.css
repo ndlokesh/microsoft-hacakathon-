@@ -389,5 +389,608 @@ code { font-family: var(--font-mono); font-size: 0.875em; background: var(--bg-e
 @media (max-width: 480px) {
   .risk-summary-items { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; }
+  .vendor-matrix-table { font-size: 0.7rem; }
+  .roi-bar { flex-direction: column; gap: 0.6rem; }
 }
 @media print { .header, .cookie-banner, .mobile-tabs, .toast-container { display: none !important; } .page-wrapper { padding-top: 0; } }
+
+/* ══════════════════════════════════════════
+   FEATURE 1: Procurement Impact / ROI Bar
+══════════════════════════════════════════ */
+.roi-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(14,165,233,0.06));
+  border: 1px solid rgba(16,185,129,0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.roi-bar-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 120px;
+}
+.roi-bar-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--accent-emerald-light);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.roi-bar-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-top: 0.15rem;
+}
+.roi-bar-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.roi-bar-cta {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ROI Calculator Modal */
+.roi-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+.roi-modal-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.4rem;
+}
+.roi-modal-field input {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.85rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  min-height: 44px;
+  transition: border-color var(--transition);
+}
+.roi-modal-field input:focus {
+  border-color: var(--border-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+}
+.roi-result-card {
+  background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(14,165,233,0.08));
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+.roi-result-card.visible { display: block; }
+.roi-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.roi-result-item {
+  text-align: center;
+}
+.roi-result-item .val {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--accent-emerald-light);
+  display: block;
+  letter-spacing: -0.03em;
+}
+.roi-result-item .lbl {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.2rem;
+  display: block;
+}
+
+/* ══════════════════════════════════════════
+   FEATURE 2: Memory Timeline / Node View
+══════════════════════════════════════════ */
+.memory-view-toggle {
+  display: flex;
+  gap: 0.4rem;
+  background: var(--bg-base);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  border: 1px solid var(--border);
+}
+.mem-view-btn {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: calc(var(--radius-md) - 2px);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  min-height: 28px;
+}
+.mem-view-btn.active {
+  background: var(--bg-elevated);
+  color: var(--accent-emerald-light);
+}
+
+/* Timeline layout */
+.memory-timeline-view {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  padding: 1rem 1.25rem;
+  position: relative;
+}
+.memory-timeline-view.active { display: flex; }
+.memory-entries-view.active { display: flex; }
+.memory-entries-view { display: none; flex-direction: column; gap: 0.75rem; padding: 1rem 1.25rem; }
+
+.timeline-track {
+  position: relative;
+  padding-left: 2.5rem;
+}
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  left: 0.85rem;
+  top: 1rem;
+  bottom: 1rem;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent-emerald), rgba(16,185,129,0.2));
+  border-radius: var(--radius-full);
+}
+.timeline-node {
+  position: relative;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.timeline-node:last-child { margin-bottom: 0; }
+.timeline-node-dot {
+  position: absolute;
+  left: -2.1rem;
+  top: 0.75rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 0 8px rgba(16,185,129,0.5);
+  transition: all var(--transition);
+  z-index: 1;
+}
+.timeline-node:hover .timeline-node-dot,
+.timeline-node.expanded .timeline-node-dot {
+  transform: scale(1.4);
+  box-shadow: 0 0 16px rgba(16,185,129,0.8);
+}
+.timeline-node-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.9rem;
+  transition: all var(--transition);
+}
+.timeline-node:hover .timeline-node-card,
+.timeline-node.expanded .timeline-node-card {
+  border-color: var(--border-accent);
+  background: var(--bg-card);
+}
+.timeline-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.timeline-node-date {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--accent-emerald);
+  font-weight: 700;
+}
+.timeline-node-type {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.timeline-node-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+}
+.timeline-node-arrow {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+.timeline-node.expanded .timeline-node-arrow { transform: rotate(180deg); }
+
+/* Node detail drawer */
+.timeline-node-drawer {
+  display: none;
+  margin-top: 0.6rem;
+  padding: 0.85rem;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-accent);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  animation: fadeIn 0.25s ease;
+}
+.timeline-node.expanded .timeline-node-drawer { display: block; }
+.timeline-drawer-snippet {
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-emerald-light);
+  margin-top: 0.6rem;
+  border-left: 2px solid var(--accent-emerald);
+  white-space: pre-wrap;
+}
+.timeline-drawer-leverage {
+  margin-top: 0.5rem;
+  font-size: 0.77rem;
+  font-weight: 700;
+  color: var(--accent-emerald);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ══════════════════════════════════════════
+   FEATURE 3: Vendor Comparison Matrix
+══════════════════════════════════════════ */
+.vendor-matrix-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-top: 1rem;
+}
+.vendor-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.vendor-matrix-table th {
+  background: var(--bg-elevated);
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.vendor-matrix-table th.year-col {
+  text-align: center;
+  color: var(--accent-emerald-light);
+}
+.vendor-matrix-table td {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.4;
+}
+.vendor-matrix-table tr:last-child td { border-bottom: none; }
+.vendor-matrix-table tbody tr:hover td { background: var(--bg-elevated); }
+.vendor-matrix-table td:first-child {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.vendor-matrix-table td.year-col { text-align: center; }
+.trend-up {
+  color: var(--risk-high);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.trend-down {
+  color: var(--accent-emerald);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.trend-neutral {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.matrix-breach-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--risk-high-bg);
+  color: var(--risk-high);
+  border-radius: var(--radius-full);
+  padding: 1px 6px;
+  border: 1px solid rgba(239,68,68,0.3);
+}
+.matrix-ok-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--risk-low-bg);
+  color: var(--risk-low);
+  border-radius: var(--radius-full);
+  padding: 1px 6px;
+  border: 1px solid rgba(16,185,129,0.3);
+}
+.vendor-matrix-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.25rem;
+  overflow-x: auto;
+}
+.vendor-matrix-tab {
+  padding: 0.65rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition);
+  white-space: nowrap;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+.vendor-matrix-tab:hover { color: var(--text-primary); }
+.vendor-matrix-tab.active {
+  color: var(--accent-emerald);
+  border-bottom-color: var(--accent-emerald);
+}
+
+/* ══════════════════════════════════════════
+   FEATURE 4: Slack & Email Modals
+══════════════════════════════════════════ */
+.slack-modal-preview {
+  background: #1A1D21;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-top: 1rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  font-family: 'Lato', var(--font-sans);
+}
+.slack-workspace-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.slack-workspace-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2BAC76;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(43,172,118,0.6);
+}
+.slack-workspace-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #F8F8F8;
+}
+.slack-channel-name {
+  font-size: 0.72rem;
+  color: #ABABAD;
+  margin-left: auto;
+}
+.slack-message {
+  display: flex;
+  gap: 0.75rem;
+}
+.slack-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent-emerald), #0EA5E9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.slack-message-body { flex: 1; }
+.slack-sender-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+.slack-sender-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #F8F8F8;
+}
+.slack-app-tag {
+  font-size: 0.58rem;
+  font-weight: 700;
+  background: #2BAC76;
+  color: #0F172A;
+  padding: 1px 4px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.slack-timestamp {
+  font-size: 0.7rem;
+  color: #ABABAD;
+}
+.slack-msg-text {
+  font-size: 0.82rem;
+  color: #D1D2D3;
+  line-height: 1.55;
+}
+.slack-msg-attachment {
+  margin-top: 0.75rem;
+  border-left: 3px solid var(--accent-emerald);
+  padding: 0.65rem 0.85rem;
+  background: rgba(16,185,129,0.08);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.slack-attachment-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-emerald-light);
+  margin-bottom: 0.4rem;
+}
+.slack-attachment-field {
+  font-size: 0.75rem;
+  color: #ABABAD;
+  margin-bottom: 0.2rem;
+  display: flex;
+  gap: 0.5rem;
+}
+.slack-attachment-field strong { color: #D1D2D3; }
+.slack-reactions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+.slack-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  color: #ABABAD;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.slack-reaction:hover { background: rgba(255,255,255,0.12); }
+
+/* ══════════════════════════════════════════
+   FEATURE 5: Contract Redline Exporter
+══════════════════════════════════════════ */
+.redline-preview-wrap {
+  display: none;
+  margin-top: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  animation: fadeIn 0.35s ease;
+}
+.redline-preview-wrap.visible { display: block; }
+.redline-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.redline-preview-body {
+  padding: 1rem 1.25rem;
+  background: var(--bg-base);
+  font-size: 0.78rem;
+  line-height: 1.9;
+  color: var(--text-secondary);
+  max-height: 260px;
+  overflow-y: auto;
+}
+.redline-removed {
+  color: var(--risk-high);
+  text-decoration: line-through;
+  background: rgba(239,68,68,0.08);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+.redline-added {
+  color: #4ADE80;
+  background: rgba(74,222,128,0.08);
+  border-radius: 2px;
+  padding: 0 2px;
+  font-weight: 600;
+}
+.redline-unchanged { color: var(--text-muted); }
+.redline-clause-block {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--border);
+}
+.redline-clause-block.has-changes { border-left-color: var(--risk-high); }
+.redline-clause-num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+}
+.redline-export-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.redline-stats {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.75rem;
+}
+.redline-stat-item { display: flex; align-items: center; gap: 0.3rem; }
+.redline-dot-red { width: 6px; height: 6px; border-radius: 50%; background: var(--risk-high); flex-shrink: 0; }
+.redline-dot-green { width: 6px; height: 6px; border-radius: 50%; background: #4ADE80; flex-shrink: 0; }
